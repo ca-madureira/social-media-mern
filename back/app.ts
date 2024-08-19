@@ -3,6 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import userRoute from './routes/user.route';
+import postRoute from './routes/postRoute';
 
 export const app = express();
 
@@ -18,3 +19,4 @@ app.use(
 );
 
 app.use('/user', userRoute);
+app.use('/posts', postRoute);

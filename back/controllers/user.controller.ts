@@ -11,7 +11,7 @@ export const createUser = async (
       .status(201)
       .json({ message: 'Usuário registrado com sucesso', user });
   } catch (error: any) {
-    if (error.message === 'All fields are required') {
+    if (error.message === 'preencha os campos') {
       return res.status(400).json({ message: error.message });
     }
     if (error.message === 'User already exists') {

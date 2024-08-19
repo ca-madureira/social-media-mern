@@ -5,25 +5,28 @@ import { useNavigate } from 'react-router-dom';
 import { useLoginMutation, useRegisterMutation } from '../redux/auth/authApi';
 import LoginLayout from '../components/LoginLayout';
 
+interface FormData {
+  name?: string;
+  email: string;
+  password: string;
+  confirmPassword?: string;
+}
+
 const Login = () => {
   const [isLogin, setIsLogin] = useState(false);
-  const [profileImage, setProfileImage] = useState(
-    'https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541',
+  const [profileImage, setProfileImage] = useState<string | undefined>(
+    undefined,
   );
-
-  const handleImageChange = (e: any) => {
-    if (e.target.files && e.target.files[0]) {
-      setProfileImage(URL.createObjectURL(e.target.files[0]));
-    }
-  };
+  const [selectedImage, setSelectedImage] = useState<File | undefined>(
+    undefined,
+  );
 
   const {
     register,
     handleSubmit,
     formState: { errors, isValid },
     getValues,
-    watch,
-  } = useForm({
+  } = useForm<FormData>({
     defaultValues: {
       name: '',
       email: '',
@@ -38,16 +41,29 @@ const Login = () => {
 
   const navigate = useNavigate();
 
-  const submitHandler = async (data: any) => {
+  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files[0]) {
+      const file = event.target.files[0];
+      setProfileImage(URL.createObjectURL(file));
+      // setSelectedImage(file);
+    }
+  };
+
+  const submitHandler = async (data: FormData) => {
     const { name, email, password } = data;
 
     try {
       if (isLogin) {
-        const result = await login({ email, password }).unwrap();
-        navigate('/', { state: { name, email } });
+        await login({ email, password }).unwrap();
+        navigate('/');
       } else {
-        const result = await registerUser({ name, email, password }).unwrap();
-        navigate('/', { state: { name, email } });
+        await registerUser({
+          name: name!,
+          email,
+          password,
+          // avatar: selectedImage,
+        }).unwrap();
+        navigate('/');
       }
     } catch (error) {
       console.error('Erro ao processar a solicitação:', error);
@@ -58,7 +74,7 @@ const Login = () => {
     <LoginLayout>
       <div className="flex gap-4 border rounded-lg shadow-lg bg-white justify-center max-w-max p-6 h-[550px]">
         <form
-          className="flex flex-col space-y-2 p-6 "
+          className="flex flex-col space-y-2 p-6"
           onSubmit={handleSubmit(submitHandler)}
         >
           <div className="flex justify-center items-center h-full">
@@ -71,12 +87,13 @@ const Login = () => {
             <>
               <div className="relative flex justify-center mb-4">
                 <img
-                  src={profileImage}
+                  src={profileImage || social} // Use a imagem padrão se não houver imagem selecionada
                   alt="Profile"
-                  className="w-24 h-24 rounded-full border-2 border-purple-900 "
+                  className="w-24 h-24 rounded-full border-2 border-purple-900"
                 />
                 <input
                   className="absolute top-0 left-0 opacity-0 w-full h-full cursor-pointer"
+                  name="avatar"
                   type="file"
                   accept="image/*"
                   onChange={handleImageChange}
@@ -92,7 +109,7 @@ const Login = () => {
                   },
                   required: {
                     value: true,
-                    message: 'Nome é obrigatorio',
+                    message: 'Nome é obrigatório',
                   },
                 })}
                 placeholder="Nome"
@@ -107,7 +124,7 @@ const Login = () => {
               )}
             </>
           ) : (
-            <img src={social} className="w-46 h-36" />
+            <img src={social} className="w-46 h-36" alt="Social Media" />
           )}
 
           <input
@@ -120,11 +137,11 @@ const Login = () => {
               pattern: {
                 value:
                   /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
-                message: 'Insira um email valido',
+                message: 'Insira um email válido',
               },
               required: {
                 value: true,
-                message: 'Email é obrigatorio',
+                message: 'Email é obrigatório',
               },
             })}
             placeholder="Email"
@@ -139,11 +156,11 @@ const Login = () => {
               {...register('password', {
                 required: {
                   value: true,
-                  message: 'Senha é obrigatoria',
+                  message: 'Senha é obrigatória',
                 },
                 minLength: {
                   value: 6,
-                  message: 'Senha de conter ao menos 6 caracteres',
+                  message: 'Senha deve conter ao menos 6 caracteres',
                 },
               })}
               placeholder="Senha"
@@ -164,12 +181,12 @@ const Login = () => {
                   {...register('confirmPassword', {
                     required: {
                       value: true,
-                      message: 'Senha é obrigatoria',
+                      message: 'Confirmação de senha é obrigatória',
                     },
                     validate: (value) => {
                       const password = getValues('password');
                       if (value !== password) {
-                        return 'Senhas não se coincidem';
+                        return 'Senhas não coincidem';
                       }
                     },
                   })}
@@ -194,17 +211,20 @@ const Login = () => {
                 className="font-semibold font-sm text-blue-600 underline"
               >
                 {' '}
-                esqueceu a senha?
+                Esqueceu a senha?
               </a>
             )}
           </div>
 
-          <button className="font-mooli font-semibold p-2 border border-purple-900 text-purple-900 rounded hover:bg-purple-900 hover:text-white">
+          <button
+            type="submit"
+            className="font-mooli font-semibold p-2 border border-purple-900 text-purple-900 rounded hover:bg-purple-900 hover:text-white"
+          >
             {isLogin ? 'Entrar' : 'Criar'}
           </button>
         </form>
         <div className="flex justify-center items-center">
-          <div className="flex items-center rounded-b-2xl rounded-t-2xl  w-full h-full bg-purple-900 text-white">
+          <div className="flex items-center rounded-b-2xl rounded-t-2xl w-full h-full bg-purple-900 text-white">
             <div className="flex flex-col gap-4 items-center w-[350px] p-8">
               {isLogin ? (
                 <div className="w-full font-mooli">
@@ -212,22 +232,16 @@ const Login = () => {
                   <p>
                     Entre em sua conta e veja o que as pessoas estão falando{' '}
                   </p>
-                  <button className="hidden" id="login">
-                    Entrar
-                  </button>
                 </div>
               ) : (
                 <div className="w-full font-mooli">
                   <h1>Olá!</h1>
                   <p>Faça e encontre amigos no mundo todo</p>
-                  <button className="hidden" id="register">
-                    Criar conta
-                  </button>
                 </div>
               )}
               <button
                 className="font-mooli font-semibold border border-white text-white p-2 rounded w-full hover:bg-white hover:text-purple-900"
-                onClick={() => setIsLogin((isLogin) => !isLogin)}
+                onClick={() => setIsLogin((prevIsLogin) => !prevIsLogin)}
               >
                 {isLogin ? 'Criar' : 'Entrar'}
               </button>

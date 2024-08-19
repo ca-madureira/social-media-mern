@@ -1,13 +1,15 @@
 import { apiSlice } from '../api/apiSlice';
 import { userLoggedOut, userRegistration } from './authSlice';
 
+type User = {
+  name: string;
+  email: string;
+};
+
 type RegistrationResponse = {
   user: {
-    token: '';
-    user: {
-      name: string;
-      email: string;
-    };
+    token: string;
+    user: User;
   };
 };
 
@@ -15,63 +17,63 @@ type RegistrationData = {
   name: string;
   email: string;
   password: string;
+  // avatar?: File;
 };
 
 export const authApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     register: builder.mutation<RegistrationResponse, RegistrationData>({
-      query: (data) => ({
-        url: '/user/create',
-        method: 'POST',
-        body: data,
-        credentials: 'include' as const,
-      }),
+      query: (data) => {
+        // const formData = new FormData();
+        // formData.append('name', name);
+        // formData.append('email', email);
+        // formData.append('password', password);
+        // if (avatar) formData.append('avatar', avatar);
+
+        return {
+          url: '/user/create',
+          method: 'POST',
+          body: data,
+          credentials: 'include' as const,
+        };
+      },
       async onQueryStarted(arg, { queryFulfilled, dispatch }) {
         try {
           const result = await queryFulfilled;
-
-          dispatch(userRegistration({ token: result.data.user.token }));
-          console.log('o resultado é:', result.data.user.token);
+          console.log(result);
+          dispatch(
+            userRegistration({
+              token: result.data.user.token,
+              user: result.data.user.user,
+            }),
+          );
         } catch (error: any) {
-          console.log(error);
+          console.error('Erro ao processar a solicitação:', error);
         }
       },
     }),
 
-    login: builder.mutation({
+    login: builder.mutation<
+      RegistrationResponse,
+      { email: string; password: string }
+    >({
       query: ({ email, password }) => ({
-        url: '/login',
+        url: '/user/create',
         method: 'POST',
-        body: {
-          email,
-          password,
-        },
+        body: { email, password },
         credentials: 'include' as const,
       }),
-      // async onQueryStarted(arg, { queryFulfilled, dispatch }) {
-      //   try {
-      //     const result = await queryFulfilled;
-      //     dispatch(
-      //       userLoggedIn({
-      //         accessToken: result.data.accessToken,
-      //         user: result.data.user,
-      //       }),
-      //     );
-      //   } catch (error: any) {
-      //     console.log(error);
-      //   }
-      // },
     }),
 
     logOut: builder.query({
       query: () => ({
         url: 'logout',
         method: 'GET',
-
         credentials: 'include' as const,
       }),
       async onQueryStarted(arg, { queryFulfilled, dispatch }) {
         try {
+          await queryFulfilled;
           dispatch(userLoggedOut());
         } catch (error: any) {
           console.log(error);
@@ -81,10 +83,5 @@ export const authApi = apiSlice.injectEndpoints({
   }),
 });
 
-export const {
-  useRegisterMutation,
-
-  useLoginMutation,
-
-  useLogOutQuery,
-} = authApi;
+export const { useRegisterMutation, useLoginMutation, useLogOutQuery } =
+  authApi;

@@ -1,13 +1,13 @@
-import { useLocation } from 'react-router-dom';
 import Header from '../components/Header';
 import PostEdit from '../components/PostEdit';
 import Post from '../components/Post';
-import Galery from '../components/Friends';
-import ProfileCard from '../components/ProfileCard';
 import Friends from '../components/Friends';
+import ProfileCard from '../components/ProfileCard';
+import Modal from '../components/Modal';
+import { useState } from 'react';
+
 const Home = () => {
-  // const location = useLocation();
-  // const { name, email } = location.state || {};
+  const [openModal, setOpenModal] = useState(false);
 
   return (
     <div>
@@ -15,10 +15,13 @@ const Home = () => {
       <div className="flex">
         <ProfileCard />
         <div className="">
-          <PostEdit />
+          <PostEdit setOpenModal={setOpenModal} />
           <Post />
         </div>
         <Friends />
+        {openModal && (
+          <Modal openModal={openModal} setOpenModal={setOpenModal} />
+        )}
       </div>
     </div>
   );
