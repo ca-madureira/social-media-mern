@@ -29,6 +29,13 @@ const authSlice = createSlice({
       state.token = action.payload.token;
       state.user = action.payload.user;
     },
+    userLoggedIn: (
+      state,
+      action: PayloadAction<{ accessToken: string; user: User }>, // Corrigido para `User`
+    ) => {
+      state.token = action.payload.accessToken;
+      state.user = action.payload.user;
+    },
     userLoggedOut: (state) => {
       state.token = '';
       state.user.name = '';
@@ -37,5 +44,6 @@ const authSlice = createSlice({
   },
 });
 
-export const { userRegistration, userLoggedOut } = authSlice.actions;
+export const { userRegistration, userLoggedOut, userLoggedIn } =
+  authSlice.actions;
 export default authSlice.reducer;

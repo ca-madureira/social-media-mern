@@ -1,5 +1,5 @@
 import { apiSlice } from '../api/apiSlice';
-import { userLoggedOut, userRegistration } from './authSlice';
+import { userLoggedOut, userRegistration, userLoggedIn } from './authSlice';
 
 type User = {
   name: string;
@@ -18,6 +18,19 @@ type RegistrationData = {
   email: string;
   password: string;
   // avatar?: File;
+};
+
+type LoginData = {
+  email: string;
+  password: string;
+};
+
+type LoginDataResponse = {
+  token: string;
+  user: {
+    name: string;
+    email: string;
+  };
 };
 
 export const authApi = apiSlice.injectEndpoints({
@@ -53,16 +66,27 @@ export const authApi = apiSlice.injectEndpoints({
       },
     }),
 
-    login: builder.mutation<
-      RegistrationResponse,
-      { email: string; password: string }
-    >({
+    login: builder.mutation<LoginDataResponse, LoginData>({
       query: ({ email, password }) => ({
-        url: '/user/create',
+        url: '/user/login',
         method: 'POST',
         body: { email, password },
         credentials: 'include' as const,
       }),
+      async onQueryStarted(arg, { queryFulfilled, dispatch }) {
+        try {
+          const result = await queryFulfilled;
+          console.log(result);
+          dispatch(
+            userLoggedIn({
+              accessToken: result.data.token,
+              user: result.data.user,
+            }),
+          );
+        } catch (error: any) {
+          console.log(error);
+        }
+      },
     }),
 
     logOut: builder.query({

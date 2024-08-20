@@ -1,7 +1,9 @@
+import mongoose from 'mongoose';
 import { signToken } from '../middleware/auth';
 import User from '../models/user.model';
 import bcrypt from 'bcryptjs';
-import cloudinary from 'cloudinary';
+
+import jwt from 'jsonwebtoken';
 
 interface CreateUserData {
   name: string;
@@ -10,7 +12,25 @@ interface CreateUserData {
   // avatar: string;
 }
 
-const create = async (data: CreateUserData) => {
+interface UserData {
+  email: string;
+  password: string;
+}
+
+interface LoginCredentials {
+  email: string;
+  password: string;
+}
+
+interface AuthServiceResponse {
+  token: string;
+  user: {
+    name: string;
+    email: string;
+  };
+}
+
+export const create = async (data: CreateUserData) => {
   const { name, email, password } = data;
 
   if (
@@ -54,6 +74,36 @@ const create = async (data: CreateUserData) => {
   const token = signToken(newUser);
 
   return { user: newUser, token };
+};
+
+export const loginService = async (
+  credentials: LoginCredentials,
+): Promise<AuthServiceResponse | null> => {
+  const { email, password } = credentials;
+
+  // Encontrar o usuário pelo e-mail
+  const user = await User.findOne({ email });
+  if (!user) {
+    throw new Error('Usuário não encontrado');
+  }
+
+  console.log(user);
+  const isPasswordValid = await bcrypt.compare(password, user.password);
+  console.log('senha', isPasswordValid);
+  if (!isPasswordValid) {
+    throw new Error('Credenciais inválidas');
+  }
+
+  // Gerar o token JWT
+  const token = signToken(user);
+
+  return {
+    token,
+    user: {
+      name: user.name,
+      email: user.email,
+    },
+  };
 };
 
 export default create;
