@@ -5,6 +5,9 @@ import Friends from '../components/Friends';
 import ProfileCard from '../components/ProfileCard';
 import Modal from '../components/Modal';
 import { useState } from 'react';
+import Notify from './Notify';
+import Friend from './Friend';
+import FriendPosts from '../components/FriendPost';
 
 const Home = () => {
   const [openModal, setOpenModal] = useState(false);
@@ -18,7 +21,7 @@ const Home = () => {
           <PostEdit setOpenModal={setOpenModal} />
           <Post />
         </div>
-        <Friends />
+        <FriendPosts />
         {openModal && (
           <Modal openModal={openModal} setOpenModal={setOpenModal} />
         )}

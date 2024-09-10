@@ -2,14 +2,14 @@ require('dotenv').config();
 import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
-import userRoute from './routes/user.route';
+import userRouter from './routes/user.route';
 import postRoute from './routes/postRoute';
 
 export const app = express();
 
-app.use(express.json({ limit: '50mb' }));
+// app.use(express.json({ limit: '50mb' }));
 
-app.use(cookieParser());
+app.use(express.json());
 
 app.use(
   cors({
@@ -18,5 +18,5 @@ app.use(
   }),
 );
 
-app.use('/user', userRoute);
+app.use('/user', userRouter);
 app.use('/posts', postRoute);

@@ -1,6 +1,9 @@
 import { Request, Response } from 'express';
-import create from '../services/user.service';
-import { getUserPostsService } from '../services/post.service';
+import { create, deletePostByIdService } from '../services/post.service';
+import {
+  getUserPostsService,
+  updatePostByIdService,
+} from '../services/post.service';
 import mongoose from 'mongoose';
 
 export const createPost = async (
@@ -8,7 +11,7 @@ export const createPost = async (
   res: Response,
 ): Promise<Response | void> => {
   try {
-    // Verifica se o usuário está logado e tem um ID válido
+    //Verifica se o usuário está logado e tem um ID válido
     const author = req.user?._id;
     if (!author) {
       return res.status(401).json({ message: 'Usuário não autorizado' });
@@ -62,5 +65,47 @@ export const getUserPosts = async (
   } catch (error: unknown) {
     console.error('Erro ao retornar os posts:', error);
     return res.status(500).json({ message: 'Erro ao retornar os posts' });
+  }
+};
+
+export const deletePostById = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params; // Extraímos 'id' de req.params
+
+    // Convertendo 'id' para ObjectId
+    const objectId = new mongoose.Types.ObjectId(id);
+
+    // Chamando o serviço para deletar o post
+    await deletePostByIdService(objectId);
+
+    res.status(200).json({ success: true, message: `Post deletado` });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: 'Erro ao deletar post',
+      error: error.message,
+    });
+  }
+};
+
+export const updatePostById = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params; // Extraímos 'id' de req.params
+
+    // Verifica se o ID é um ObjectId válido
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ success: false, message: 'ID inválido' });
+    }
+
+    // Chamando o serviço para atualizar o post
+    await updatePostByIdService({ id, ...req.body });
+
+    res.status(200).json({ success: true, message: 'Post atualizado' });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: 'Erro ao atualizar o post',
+      error: error.message,
+    });
   }
 };

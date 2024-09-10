@@ -4,6 +4,8 @@ import { userLoggedOut, userRegistration, userLoggedIn } from './authSlice';
 type User = {
   name: string;
   email: string;
+  id: string;
+  avatar: string;
 };
 
 type RegistrationResponse = {
@@ -13,12 +15,7 @@ type RegistrationResponse = {
   };
 };
 
-type RegistrationData = {
-  name: string;
-  email: string;
-  password: string;
-  // avatar?: File;
-};
+type RegistrationData = FormData; // Atualizado para FormData
 
 type LoginData = {
   email: string;
@@ -30,30 +27,29 @@ type LoginDataResponse = {
   user: {
     name: string;
     email: string;
+    id: string;
   };
+};
+
+type SearchResponse = {
+  users: User[];
 };
 
 export const authApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     register: builder.mutation<RegistrationResponse, RegistrationData>({
-      query: (data) => {
-        // const formData = new FormData();
-        // formData.append('name', name);
-        // formData.append('email', email);
-        // formData.append('password', password);
-        // if (avatar) formData.append('avatar', avatar);
-
-        return {
-          url: '/user/create',
-          method: 'POST',
-          body: data,
-          credentials: 'include' as const,
-        };
-      },
+      query: (data) => ({
+        url: '/user/create',
+        method: 'POST',
+        body: data,
+        credentials: 'include' as const,
+        headers: {
+          // Removido o header 'Content-Type', pois o FormData já define isso automaticamente
+        },
+      }),
       async onQueryStarted(arg, { queryFulfilled, dispatch }) {
         try {
           const result = await queryFulfilled;
-          console.log(result);
           dispatch(
             userRegistration({
               token: result.data.user.token,
@@ -76,7 +72,6 @@ export const authApi = apiSlice.injectEndpoints({
       async onQueryStarted(arg, { queryFulfilled, dispatch }) {
         try {
           const result = await queryFulfilled;
-          console.log(result);
           dispatch(
             userLoggedIn({
               accessToken: result.data.token,
@@ -89,23 +84,31 @@ export const authApi = apiSlice.injectEndpoints({
       },
     }),
 
-    logOut: builder.query({
-      query: () => ({
-        url: 'logout',
-        method: 'GET',
+    deleteAccount: builder.mutation<void, string>({
+      query: (idUser) => ({
+        url: `/user/delete/${idUser}`,
+        method: 'DELETE',
         credentials: 'include' as const,
       }),
-      async onQueryStarted(arg, { queryFulfilled, dispatch }) {
-        try {
-          await queryFulfilled;
-          dispatch(userLoggedOut());
-        } catch (error: any) {
-          console.log(error);
-        }
-      },
+    }),
+
+    searchUsers: builder.query<
+      SearchResponse,
+      { name?: string; email?: string }
+    >({
+      query: ({ name, email }) => ({
+        url: '/user/search',
+        method: 'GET',
+        params: { name, email },
+        credentials: 'include' as const,
+      }),
     }),
   }),
 });
 
-export const { useRegisterMutation, useLoginMutation, useLogOutQuery } =
-  authApi;
+export const {
+  useRegisterMutation,
+  useLoginMutation,
+  useDeleteAccountMutation,
+  useSearchUsersQuery,
+} = authApi;

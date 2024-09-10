@@ -22,17 +22,10 @@ const postSchema = new Schema(
       },
     ],
     author: {
-      type: mongoose.Types.ObjectId,
+      type: String,
       ref: 'User',
       required: true,
     },
-
-    comments: [
-      {
-        type: mongoose.Types.ObjectId,
-        ref: 'Comment',
-      },
-    ],
   },
   {
     timestamps: true, // Habilita os campos createdAt e updatedAt

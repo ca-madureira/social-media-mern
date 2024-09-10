@@ -6,8 +6,17 @@ interface CreatePostData {
   author: mongoose.Types.ObjectId;
 }
 
+interface UpdatePostData {
+  content: string;
+  id: mongoose.Types.ObjectId;
+}
+
 interface UserPostsData {
   author: mongoose.Types.ObjectId;
+}
+
+interface PostById {
+  id: mongoose.Types.ObjectId;
 }
 
 // Função para criar um novo post
@@ -29,4 +38,15 @@ export const getUserPostsService = async (data: UserPostsData) => {
     .sort('-createdAt'); // Ordena por data de criação (mais recente primeiro)
 
   return posts; // Retorna a lista de posts
+};
+
+export const deletePostByIdService = async (id: mongoose.Types.ObjectId) => {
+  await Post.findByIdAndDelete(id);
+};
+
+export const updatePostByIdService = async (data: UpdatePostData) => {
+  const { id, content } = data;
+
+  // Atualiza o post pelo ID
+  await Post.findByIdAndUpdate(id, { content });
 };

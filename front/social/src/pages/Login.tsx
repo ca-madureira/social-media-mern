@@ -5,28 +5,15 @@ import { useNavigate } from 'react-router-dom';
 import { useLoginMutation, useRegisterMutation } from '../redux/auth/authApi';
 import LoginLayout from '../components/LoginLayout';
 
-interface FormData {
-  name?: string;
-  email: string;
-  password: string;
-  confirmPassword?: string;
-}
-
 const Login = () => {
-  const [isLogin, setIsLogin] = useState(false);
-  const [profileImage, setProfileImage] = useState<string | undefined>(
-    undefined,
-  );
-  const [selectedImage, setSelectedImage] = useState<File | undefined>(
-    undefined,
-  );
+  const [isLogin, setIsLogin] = useState(true);
 
   const {
     register,
     handleSubmit,
     formState: { errors, isValid },
     getValues,
-  } = useForm<FormData>({
+  } = useForm({
     defaultValues: {
       name: '',
       email: '',
@@ -38,31 +25,24 @@ const Login = () => {
 
   const [login] = useLoginMutation();
   const [registerUser] = useRegisterMutation();
-
   const navigate = useNavigate();
 
-  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files[0]) {
-      const file = event.target.files[0];
-      setProfileImage(URL.createObjectURL(file));
-      // setSelectedImage(file);
-    }
-  };
-
-  const submitHandler = async (data: FormData) => {
+  const submitHandler = async (data: any) => {
     const { name, email, password } = data;
 
     try {
       if (isLogin) {
+        // Caso de login
         await login({ email, password }).unwrap();
         navigate('/');
       } else {
-        await registerUser({
-          name: name!,
-          email,
-          password,
-          // avatar: selectedImage,
-        }).unwrap();
+        // Caso de registro
+        const formData = new FormData();
+        formData.append('name', name);
+        formData.append('email', email);
+        formData.append('password', password);
+
+        await registerUser(formData).unwrap();
         navigate('/');
       }
     } catch (error) {
@@ -83,48 +63,28 @@ const Login = () => {
             </h1>
           </div>
 
-          {!isLogin ? (
-            <>
-              <div className="relative flex justify-center mb-4">
-                <img
-                  src={profileImage || social} // Use a imagem padrão se não houver imagem selecionada
-                  alt="Profile"
-                  className="w-24 h-24 rounded-full border-2 border-purple-900"
-                />
-                <input
-                  className="absolute top-0 left-0 opacity-0 w-full h-full cursor-pointer"
-                  name="avatar"
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                />
-              </div>
-              <input
-                type="text"
-                id="name"
-                {...register('name', {
-                  minLength: {
-                    value: 3,
-                    message: 'Nome deve conter ao menos 3 caracteres',
-                  },
-                  required: {
-                    value: true,
-                    message: 'Nome é obrigatório',
-                  },
-                })}
-                placeholder="Nome"
-                className={`p-2 border rounded w-60 border-purple-900 text-purple-900 font-mooli outline-none ${
-                  errors.name ? 'border-red-500' : 'border-[#c3cad9]'
-                }`}
-              />
-              {errors.name?.message && (
-                <p className="text-red-500 text-xs mt-1">
-                  {errors.name?.message}
-                </p>
-              )}
-            </>
-          ) : (
-            <img src={social} className="w-46 h-36" alt="Social Media" />
+          {!isLogin && (
+            <input
+              type="text"
+              id="name"
+              {...register('name', {
+                minLength: {
+                  value: 3,
+                  message: 'Nome deve conter ao menos 3 caracteres',
+                },
+                required: {
+                  value: true,
+                  message: 'Nome é obrigatório',
+                },
+              })}
+              placeholder="Nome"
+              className={`p-2 border rounded w-60 border-purple-900 text-purple-900 font-mooli outline-none ${
+                errors.name ? 'border-red-500' : 'border-[#c3cad9]'
+              }`}
+            />
+          )}
+          {errors.name?.message && (
+            <p className="text-red-500 text-xs mt-1">{errors.name?.message}</p>
           )}
 
           <input
@@ -149,6 +109,7 @@ const Login = () => {
           {errors.email?.message && (
             <p className="text-red-500 text-xs mt-1">{errors.email?.message}</p>
           )}
+
           <div className="flex flex-col items-start">
             <input
               type="password"
@@ -173,6 +134,7 @@ const Login = () => {
                 {errors.password?.message}
               </p>
             )}
+
             {!isLogin && (
               <>
                 <input
@@ -185,9 +147,7 @@ const Login = () => {
                     },
                     validate: (value) => {
                       const password = getValues('password');
-                      if (value !== password) {
-                        return 'Senhas não coincidem';
-                      }
+                      return value === password || 'Senhas não coincidem';
                     },
                   })}
                   placeholder="Repita sua senha"
@@ -210,7 +170,6 @@ const Login = () => {
                 href="#"
                 className="font-semibold font-sm text-blue-600 underline"
               >
-                {' '}
                 Esqueceu a senha?
               </a>
             )}
@@ -223,29 +182,37 @@ const Login = () => {
             {isLogin ? 'Entrar' : 'Criar'}
           </button>
         </form>
+
         <div className="flex justify-center items-center">
           <div className="flex items-center rounded-b-2xl rounded-t-2xl w-full h-full bg-purple-900 text-white">
             <div className="flex flex-col gap-4 items-center w-[350px] p-8">
               {isLogin ? (
-                <div className="w-full font-mooli">
-                  <h1>Bem-vindo(a)!</h1>
-                  <p>
-                    Entre em sua conta e veja o que as pessoas estão falando{' '}
+                <>
+                  <p className="text-center font-mooli font-semibold">
+                    Não possui uma conta?
                   </p>
-                </div>
+                  <button
+                    onClick={() => setIsLogin(false)}
+                    className="p-2 border border-white rounded hover:bg-white hover:text-purple-900"
+                  >
+                    Criar uma conta
+                  </button>
+                </>
               ) : (
-                <div className="w-full font-mooli">
-                  <h1>Olá!</h1>
-                  <p>Faça e encontre amigos no mundo todo</p>
-                </div>
+                <>
+                  <p className="text-center font-mooli font-semibold">
+                    Já possui uma conta?
+                  </p>
+                  <button
+                    onClick={() => setIsLogin(true)}
+                    className="p-2 border border-white rounded hover:bg-white hover:text-purple-900"
+                  >
+                    Entrar
+                  </button>
+                </>
               )}
-              <button
-                className="font-mooli font-semibold border border-white text-white p-2 rounded w-full hover:bg-white hover:text-purple-900"
-                onClick={() => setIsLogin((prevIsLogin) => !prevIsLogin)}
-              >
-                {isLogin ? 'Criar' : 'Entrar'}
-              </button>
             </div>
+            <img src={social} alt="Social Media" className="w-1/2 h-auto" />
           </div>
         </div>
       </div>

@@ -7,10 +7,13 @@ export interface IUser extends Document {
   name: string;
   email: string;
   password: string;
-  avatar: {
-    public_id: string;
-    url: string;
-  };
+  // avatar: {
+  //   public_id: string;
+  //   url: string;
+  // };
+  avatar: string;
+  invites: mongoose.Types.ObjectId[];
+  friends: mongoose.Types.ObjectId[];
 }
 
 const userSchema: Schema<IUser> = new mongoose.Schema(
@@ -36,9 +39,20 @@ const userSchema: Schema<IUser> = new mongoose.Schema(
       minlength: [6, 'A senha deve conter no mínimo 6 caracteres'],
     },
     avatar: {
-      public_id: String,
-      url: String,
+      type: String,
     },
+    invites: [
+      {
+        type: mongoose.Types.ObjectId,
+        ref: 'User',
+      },
+    ],
+    friends: [
+      {
+        type: mongoose.Types.ObjectId,
+        ref: 'User',
+      },
+    ],
   },
   {
     timestamps: true,
