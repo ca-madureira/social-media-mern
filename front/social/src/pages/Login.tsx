@@ -2,11 +2,16 @@ import { useState } from 'react';
 import social from '../assets/social-media.svg';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
-import { useLoginMutation, useRegisterMutation } from '../redux/auth/authApi';
+import {
+  useLoginMutation,
+  useRegisterUserMutation,
+} from '../redux/auth/authApi';
 import LoginLayout from '../components/LoginLayout';
+import ModalPassword from '../components/ModalPassword';
 
 const Login = () => {
   const [isLogin, setIsLogin] = useState(true);
+  const [openModal, setOpenModal] = useState(false);
 
   const {
     register,
@@ -24,7 +29,7 @@ const Login = () => {
   });
 
   const [login] = useLoginMutation();
-  const [registerUser] = useRegisterMutation();
+  const [registerUser] = useRegisterUserMutation();
   const navigate = useNavigate();
 
   const submitHandler = async (data: any) => {
@@ -33,21 +38,24 @@ const Login = () => {
     try {
       if (isLogin) {
         // Caso de login
-        await login({ email, password }).unwrap();
+        const response = await login({ email, password }).unwrap();
+        console.log('retorno do response', response);
+        const token = response.token;
+        localStorage.setItem('token', token);
         navigate('/');
       } else {
-        // Caso de registro
-        const formData = new FormData();
-        formData.append('name', name);
-        formData.append('email', email);
-        formData.append('password', password);
+        console.log({ name, email, password });
+        const response = await registerUser({ name, email, password }).unwrap();
 
-        await registerUser(formData).unwrap();
         navigate('/');
       }
     } catch (error) {
       console.error('Erro ao processar a solicitação:', error);
     }
+  };
+
+  const handleToggleModal = () => {
+    navigate('/forgotPass');
   };
 
   return (
@@ -169,12 +177,13 @@ const Login = () => {
               <a
                 href="#"
                 className="font-semibold font-sm text-blue-600 underline"
+                onClick={handleToggleModal}
               >
                 Esqueceu a senha?
               </a>
             )}
           </div>
-
+          {openModal && <ModalPassword />}
           <button
             type="submit"
             className="font-mooli font-semibold p-2 border border-purple-900 text-purple-900 rounded hover:bg-purple-900 hover:text-white"

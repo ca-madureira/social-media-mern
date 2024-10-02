@@ -12,11 +12,11 @@ export interface AuthState {
 }
 
 const initialState: AuthState = {
-  token: '',
+  token: localStorage.getItem('token') || '',
   user: {
-    name: '',
-    email: '',
-    id: '',
+    name: localStorage.getItem('name') || '',
+    email: localStorage.getItem('email') || '',
+    id: localStorage.getItem('id') || '',
   },
 };
 
@@ -29,22 +29,54 @@ const authSlice = createSlice({
       action: PayloadAction<{ token: string; user: User }>,
     ) => {
       state.token = action.payload.token;
-      state.user = action.payload.user;
+      state.user = {
+        name: action.payload.user?.name || '',
+        email: action.payload.user?.email || '',
+        id: action.payload.user?.id || '',
+      };
+
+      // Salva os dados no localStorage
+      localStorage.setItem('token', action.payload.token);
+      localStorage.setItem('name', action.payload.user.name);
+      localStorage.setItem('email', action.payload.user?.email);
+      localStorage.setItem('id', action.payload.user?.id);
+      console.log('valor de payload que vem do registro', action.payload);
+      console.log('valor que vem do registro', action.payload.user.name);
     },
     userLoggedIn: (
       state,
-      action: PayloadAction<{ accessToken: string; user: User }>, // Corrigido para `User`
+      action: PayloadAction<{ accessToken: string; user: User }>,
     ) => {
       state.token = action.payload.accessToken;
-      state.user = action.payload.user;
+      state.user = {
+        name: action.payload.user?.name || '',
+        email: action.payload.user?.email || '',
+        id: action.payload.user?.id || '',
+      };
+
+      // Salva os dados no localStorage
+      localStorage.setItem('token', action.payload.accessToken);
+      localStorage.setItem('name', action.payload.user?.name);
+      localStorage.setItem('email', action.payload.user?.email);
+      localStorage.setItem('id', action.payload.user?.id);
+
       console.log('to aqui', state.user.id, state.token);
     },
     userLoggedOut: (state) => {
       state.token = '';
-      state.user.name = '';
-      state.user.email = '';
-      state.user.id = '';
-      console.log('to aki', state.user.id, state.token);
+      state.user = {
+        name: '',
+        email: '',
+        id: '',
+      };
+
+      // Remove os dados do localStorage
+      localStorage.removeItem('token');
+      localStorage.removeItem('name');
+      localStorage.removeItem('email');
+      localStorage.removeItem('id');
+
+      console.log('Usuário deslogado', state.user.id, state.token);
     },
   },
 });

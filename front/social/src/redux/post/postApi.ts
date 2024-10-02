@@ -60,6 +60,20 @@ const postApi = apiSlice.injectEndpoints({
         credentials: 'include' as const,
       }),
     }),
+    votePost: builder.mutation<void, { id: string }>({
+      query: ({ id }) => ({
+        url: `/posts/vote/${id}`,
+        method: 'PUT',
+        credentials: 'include' as const,
+      }),
+    }),
+    reactPost: builder.mutation<void, { id: string; react: string }>({
+      query: ({ id, react }) => ({
+        url: `/posts/reaction/${id}`,
+        method: 'PUT',
+        body: { reaction: react }, // Inclui o body da requisição
+      }),
+    }),
   }),
 });
 
@@ -68,4 +82,6 @@ export const {
   useGetUserPostsQuery,
   useDeletePostByIdMutation,
   useEditPostMutation,
+  useVotePostMutation,
+  useReactPostMutation,
 } = postApi;

@@ -10,6 +10,9 @@ import {
   allInvites,
   allFriends,
   getFriendPosts,
+  sendForgotPasswordCode,
+  verifyCode,
+  updatePassword,
 } from '../controllers/user.controller';
 
 const userRouter = express.Router();
@@ -31,5 +34,11 @@ userRouter.put('/accept/:id', isAuthenticatedToken, acceptInvite);
 userRouter.get('/friends', isAuthenticatedToken, allFriends);
 
 userRouter.get('/friends/posts', isAuthenticatedToken, getFriendPosts);
+
+userRouter.post('/forgotPass', sendForgotPasswordCode);
+
+userRouter.post('/verifyCode', verifyCode);
+
+userRouter.put('/updatePass', updatePassword);
 
 export default userRouter;

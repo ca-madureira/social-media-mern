@@ -5,6 +5,8 @@ import {
   getUserPosts,
   deletePostById,
   updatePostById,
+  votePost,
+  reactToPost,
 } from '../controllers/post.controller';
 
 const postRoute = express.Router();
@@ -16,5 +18,9 @@ postRoute.get('/allPosts', isAuthenticatedToken, getUserPosts);
 postRoute.delete('/delete/:id', isAuthenticatedToken, deletePostById);
 
 postRoute.put('/update/:id', isAuthenticatedToken, updatePostById);
+
+postRoute.put('/reaction/:id', isAuthenticatedToken, reactToPost);
+
+postRoute.put('/vote/:id', isAuthenticatedToken, votePost);
 
 export default postRoute;

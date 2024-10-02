@@ -42,7 +42,7 @@ interface UserDelete {
 }
 
 export const create = async (data: CreateUserData) => {
-  const { name, email, password } = data;
+  const { name, email, password, avatar } = data;
 
   // const image = converteBase64(avatar);
 

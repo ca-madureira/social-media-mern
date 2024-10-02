@@ -1,6 +1,10 @@
 import { NextFunction, Request, Response } from 'express';
+import { signToken } from '../middleware/auth';
+import bcrypt from 'bcryptjs';
+import asyncHandler from '../middleware/asyncHandler';
 import mongoose, { mongo } from 'mongoose';
-
+import createToken from '../middleware/createToken';
+import PasswordResetToken from '../models/passwordReset.model';
 import {
   loginService,
   create,
@@ -9,27 +13,100 @@ import {
 import User, { IUser } from '../models/user.model';
 import { searchUserService } from '../services/user.service';
 import Post from '../models/post.model';
+import transport from '../middleware/sendMail';
 
-export const createUser = async (
-  req: Request,
-  res: Response,
-): Promise<Response | void> => {
-  try {
-    const user = await create(req.body);
+// export const createUser = async (
+//   req: Request,
+//   res: Response,
+// ): Promise<Response | void> => {
+//   try {
+//     // const user = await create(req.body);
+//     // return res
+//     //   .status(201)
+//     //   .json({ message: 'Usuário registrado com sucesso', user });
+
+//     const { name, email, password } = req.body;
+
+//     const userExist = await User.findOne({ email });
+//     if (userExist) res.status(400).send('usuario ja existe');
+
+//     const salt = await bcrypt.genSalt(10);
+//     const hashedPassword = await bcrypt.hash(password, salt);
+//     const newUser = new User({ name, email, password: hashedPassword });
+
+//     await newUser.save();
+//     const token = createToken(res, newUser);
+
+//     console.log(token);
+
+//     res.status(201).json({
+//       _id: newUser._id,
+//       username: newUser.name,
+//       email: newUser.email,
+//       token,
+//     });
+//   } catch (error: any) {
+//     if (error.message === 'preencha os campos') {
+//       return res.status(400).json({ message: error.message });
+//     }
+//     if (error.message === 'User already exists') {
+//       return res.status(409).json({ message: error.message });
+//     }
+//     console.error(error);
+//     return res.status(500).json({ message: 'Erro ao registrar usuário' });
+//   }
+// };
+
+export const createUser = asyncHandler(async (req: Request, res: Response) => {
+  const { name, email, password } = req.body;
+
+  // Verifica se todos os campos obrigatórios estão preenchidos
+  if (!name || !email || !password) {
     return res
-      .status(201)
-      .json({ message: 'Usuário registrado com sucesso', user });
+      .status(400)
+      .json({ message: 'Por favor preencha todos os campos.' });
+  }
+
+  // Verifica se o usuário já existe no banco de dados
+  const userExists = await User.findOne({ email });
+  if (userExists) {
+    return res.status(409).json({ message: 'Usuário já existe.' }); // 409 para conflito
+  }
+
+  // Gera o hash da senha
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash(password, salt);
+
+  // Cria o novo usuário com a senha criptografada
+  const newUser = new User({
+    name,
+    email,
+    password: hashedPassword,
+  });
+
+  // Tenta salvar o novo usuário no banco de dados
+  try {
+    await newUser.save();
+
+    // Gera um token para o novo usuário
+    const token = signToken(newUser);
+
+    // Retorna o sucesso da operação e o token gerado
+    return res.status(201).json({
+      message: 'Usuário registrado com sucesso',
+      user: {
+        id: newUser._id,
+        name: newUser.name,
+        email: newUser.email,
+        token,
+      },
+    });
   } catch (error: any) {
-    if (error.message === 'preencha os campos') {
-      return res.status(400).json({ message: error.message });
-    }
-    if (error.message === 'User already exists') {
-      return res.status(409).json({ message: error.message });
-    }
-    console.error(error);
+    // Trata possíveis erros na operação de salvar o usuário
+    console.error('Erro ao registrar usuário:', error.message);
     return res.status(500).json({ message: 'Erro ao registrar usuário' });
   }
-};
+});
 
 export const loginController = async (
   req: Request,
@@ -288,6 +365,158 @@ export const getFriendPosts = async (req: Request, res: Response) => {
     res.status(500).json({
       error_code: 'INTERNAL_SERVER_ERROR',
       error_description: 'Erro ao buscar os posts dos amigos',
+    });
+  }
+};
+
+export const sendForgotPasswordCode = async (req: Request, res: Response) => {
+  const { email } = req.body;
+
+  try {
+    // Verifica se o usuário existe no banco de dados
+    const exist = await User.findOne({ email });
+
+    if (!exist) {
+      return res.status(404).json({
+        success: false,
+        message: 'Usuário não existe',
+      });
+    }
+
+    // Gera um código de 6 dígitos para a recuperação de senha
+    const codeValue = Math.floor(Math.random() * 1000000).toString();
+
+    // Define a data de expiração para 1 hora a partir de agora
+    const expiresAt = new Date(Date.now() + 3600000); // 1 hora de expiração
+
+    // Cria e salva o token de recuperação de senha no banco de dados
+    await new PasswordResetToken({
+      userId: exist._id,
+      token: codeValue,
+      expiresAt, // Define a data de expiração
+    }).save();
+
+    // Envia o código por email usando o transport configurado
+    let info = await transport.sendMail({
+      from: process.env.NODE_CODE_SENDING_EMAIL_ADDRESS, // Endereço de envio
+      to: exist.email, // Email do destinatário
+      subject: 'Código para recuperação de senha', // Assunto do email
+      html: `<h1>${codeValue}</h1>`, // Corpo do email com o código
+    });
+
+    // Verifica se o email foi enviado com sucesso
+    if (info.accepted.length > 0) {
+      return res.status(200).json({
+        success: true,
+        message: 'Código de recuperação enviado com sucesso!',
+      });
+    }
+
+    // Se o email não foi enviado, retorna erro
+    return res.status(500).json({
+      success: false,
+      message: 'Falha ao enviar o código de recuperação',
+    });
+  } catch (err: any) {
+    console.error('Erro ao enviar código de recuperação:', err);
+    return res.status(500).json({
+      success: false,
+      message: 'Erro no servidor. Tente novamente mais tarde.',
+    });
+  }
+};
+
+export const verifyCode = async (req: Request, res: Response) => {
+  const { email, code } = req.body;
+  console.log('email', email);
+  console.log('code', code);
+  try {
+    // 1. Procure o usuário pelo email para obter o userId
+    const user = await User.findOne({ email });
+
+    // Se o usuário não existir, retorne erro
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'Usuário não encontrado',
+      });
+    }
+
+    // 2. Agora procure o token de recuperação de senha usando o userId
+    const tokenRecord = await PasswordResetToken.findOne({
+      userId: user._id,
+      token: code, // Comparando o código fornecido
+    });
+
+    // Se o código não for encontrado ou for inválido, retorne erro
+    if (!tokenRecord) {
+      return res.status(400).json({
+        success: false,
+        message: 'Código inválido ou expirado',
+      });
+    }
+
+    // 3. Verifique se o código já expirou
+    if (tokenRecord.expiresAt < new Date()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Código expirado',
+      });
+    }
+
+    // 4. Se o código for válido e não expirado, prossiga com a redefinição de senha
+    return res.status(200).json({
+      success: true,
+      message: 'Código verificado com sucesso',
+    });
+
+    // Opcional: Apague o token após o uso
+    // await tokenRecord.deleteOne();
+  } catch (err: any) {
+    console.error('Erro ao verificar o código:', err);
+    return res.status(500).json({
+      success: false,
+      message: 'Erro no servidor. Tente novamente mais tarde.',
+    });
+  }
+};
+
+export const updatePassword = async (req: Request, res: Response) => {
+  const { email, pass } = req.body;
+
+  console.log('email', email);
+  console.log('pass', pass);
+
+  try {
+    // 1. Verifique se o usuário existe
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'Usuário não encontrado',
+      });
+    }
+
+    // 2. Gere o hash da nova senha
+    const saltRounds = 10; // Define a complexidade do salt para o bcrypt
+    const hashedPassword = await bcrypt.hash(pass, saltRounds);
+
+    // 3. Atualize a senha do usuário no banco de dados
+    user.password = hashedPassword;
+    await user.save();
+
+    // 4. Retorne uma resposta de sucesso
+    return res.status(200).json({
+      success: true,
+      message: 'Senha atualizada com sucesso!',
+    });
+  } catch (err: any) {
+    // Caso ocorra algum erro, logue no servidor e retorne erro
+    console.error('Erro ao atualizar a senha:', err);
+    return res.status(500).json({
+      success: false,
+      message: 'Erro no servidor. Tente novamente mais tarde.',
     });
   }
 };

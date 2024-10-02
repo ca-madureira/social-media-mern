@@ -5,6 +5,7 @@ import Login from './pages/Login';
 import Home from './pages/Home';
 import Friend from './pages/Friend';
 import ProtectedRoute from './components/ProtectedRoute';
+import ModalPassword from './components/ModalPassword';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
           <Route path="friend/:id" element={<Friend />} />
         </Route>
         <Route path="/login" element={<Login />} />
+        <Route path="/forgotPass" element={<ModalPassword />} />
       </Routes>
     </Router>
   );
