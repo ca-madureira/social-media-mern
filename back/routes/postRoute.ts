@@ -1,4 +1,4 @@
-import { isAuthenticatedToken, signToken } from '../middleware/auth';
+import { isAuthenticatedToken, signToken } from '../middleware/token';
 import express from 'express';
 import {
   createPost,

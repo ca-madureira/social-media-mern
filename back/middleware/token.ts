@@ -8,16 +8,6 @@ interface DecodedToken {
   exp: number;
 }
 
-export const signRefreshToken = (user: IUser): string => {
-  const refreshToken = jwt.sign(
-    { id: user._id },
-    process.env.REFRESH_TOKEN_SECRET as string, // Use uma chave secreta diferente para refresh tokens
-    { expiresIn: '7d' }, // Tempo de expiração maior, por exemplo, 7 dias
-  );
-
-  return refreshToken;
-};
-
 export const isAuthenticatedToken = async (
   req: Request,
   res: Response,
@@ -56,23 +46,10 @@ export const isAuthenticatedToken = async (
   }
 };
 
-export const signToken = (user: IUser, res: Response) => {
-  const token = jwt.sign(
+export const signToken = (user: IUser): string => {
+  return jwt.sign(
     { id: user._id, email: user.email },
     process.env.ACCESS_TOKEN_SECRET as string,
-    { expiresIn: '1h' }, // Tempo de expiração menor para o Access Token
+    { expiresIn: '1h' },
   );
-
-  // Gere o Refresh Token
-  const refreshToken = signRefreshToken(user);
-
-  // Configure o cookie HttpOnly com o Refresh Token
-  res.cookie('refreshToken', refreshToken, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV !== 'development',
-    sameSite: 'strict',
-    maxAge: 7 * 24 * 60 * 60 * 1000, // Tempo de expiração do cookie (7 dias)
-  });
-
-  return token; // Retorna apenas o Access Token
 };

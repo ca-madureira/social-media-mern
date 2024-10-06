@@ -46,10 +46,22 @@ export const isAuthenticatedToken = async (
   }
 };
 
-export const signToken = (user: IUser): string => {
-  return jwt.sign(
+export const signToken = (user: IUser) => {
+  const token = jwt.sign(
     { id: user._id, email: user.email },
     process.env.ACCESS_TOKEN_SECRET as string,
-    { expiresIn: '1h' },
+    { expiresIn: '1h' }, // Tempo de expiração menor para o Access Token
   );
+
+  return token; // Retorna o Access Token
+};
+
+export const signRefreshToken = (user: IUser) => {
+  const refreshToken = jwt.sign(
+    { id: user._id, email: user.email },
+    process.env.REFRESH_TOKEN_SECRET as string,
+    { expiresIn: '7d' }, // Tempo de expiração do Refresh Token
+  );
+
+  return refreshToken;
 };
