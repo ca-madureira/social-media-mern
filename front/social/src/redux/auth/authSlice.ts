@@ -40,8 +40,7 @@ const authSlice = createSlice({
       localStorage.setItem('name', action.payload.user.name);
       localStorage.setItem('email', action.payload.user?.email);
       localStorage.setItem('id', action.payload.user?.id);
-      console.log('valor de payload que vem do registro', action.payload);
-      console.log('valor que vem do registro', action.payload.user.name);
+      console.log('PAYLOAD: ', action.payload);
     },
     userLoggedIn: (
       state,

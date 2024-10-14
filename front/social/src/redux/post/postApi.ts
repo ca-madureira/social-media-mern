@@ -28,6 +28,7 @@ const postApi = apiSlice.injectEndpoints({
         method: 'POST',
         body: postData,
       }),
+      invalidatesTags: ['posts'],
     }),
     getUserPosts: builder.query<PostState, AuthorData>({
       query: (authorData) => ({
@@ -35,6 +36,7 @@ const postApi = apiSlice.injectEndpoints({
         method: 'GET',
         params: { author: authorData.author },
       }),
+      providesTags: ['posts'],
       async onQueryStarted(arg, { queryFulfilled, dispatch }) {
         try {
           const { data } = await queryFulfilled;
@@ -60,11 +62,28 @@ const postApi = apiSlice.injectEndpoints({
         credentials: 'include' as const,
       }),
     }),
-    votePost: builder.mutation<void, { id: string }>({
+    votePost: builder.mutation<any, { id: string }>({
       query: ({ id }) => ({
         url: `/posts/vote/${id}`,
         method: 'PUT',
         credentials: 'include' as const,
+      }),
+      async onQueryStarted(arg, { queryFulfilled, dispatch }) {
+        try {
+          const result = await queryFulfilled;
+
+          console.log('quantidade de votos', result.data.votes);
+        } catch (error: any) {
+          console.log(error);
+        }
+      },
+      invalidatesTags: ['posts'],
+    }),
+    userVotedPost: builder.query<any, any>({
+      query: (authorData) => ({
+        url: '/vote/userVoted',
+        method: 'GET',
+        params: { author: authorData.author },
       }),
     }),
     reactPost: builder.mutation<void, { id: string; react: string }>({
@@ -84,4 +103,5 @@ export const {
   useEditPostMutation,
   useVotePostMutation,
   useReactPostMutation,
+  useUserVotedPostQuery,
 } = postApi;

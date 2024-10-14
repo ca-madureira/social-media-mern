@@ -56,6 +56,28 @@ export const acceptInviteService = async (
   return user;
 };
 
+export const declineInviteService = async (
+  userId: string,
+  inviterId: string,
+) => {
+  if (!mongoose.Types.ObjectId.isValid(inviterId)) {
+    throw new Error('ID de usuário inválido');
+  }
+
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new Error('Usuário não encontrado');
+  }
+
+  user.invites = user.invites.filter(
+    (inviteId) => inviteId.toString() !== inviterId,
+  );
+
+  await user.save();
+
+  return user;
+};
+
 export const allFriendsService = async (userId: string) => {
   const user = await User.findById(userId).populate({
     path: 'friends',

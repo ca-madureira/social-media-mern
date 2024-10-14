@@ -2,6 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 export interface PostData {
   content: string;
+  //votes: number;
   // Adicione outros campos se necessário
 }
 

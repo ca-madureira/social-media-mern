@@ -5,7 +5,7 @@ import {
   allInvites,
   acceptInvite,
   allFriends,
-  getFriendPosts,
+  declineInvite,
 } from '../controllers/friend.controller';
 
 const friendRouter = express.Router();
@@ -16,8 +16,10 @@ friendRouter.get('/invites', isAuthenticatedToken, allInvites);
 
 friendRouter.put('/accept/:id', isAuthenticatedToken, acceptInvite);
 
-friendRouter.get('/friends', isAuthenticatedToken, allFriends);
+friendRouter.put('/decline/:id', isAuthenticatedToken, declineInvite);
 
-friendRouter.get('/friends/posts', isAuthenticatedToken, getFriendPosts);
+// friendRouter.get('/friends', isAuthenticatedToken, allFriends);
+
+// friendRouter.get('/:id/friends', allFriends);
 
 export default friendRouter;

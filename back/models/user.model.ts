@@ -37,6 +37,7 @@ const userSchema: Schema<IUser> = new mongoose.Schema(
       type: String,
       required: [true, 'Por favor entre com sua senha'],
       minlength: [6, 'A senha deve conter no mínimo 6 caracteres'],
+      select: false,
     },
     avatar: {
       type: String,

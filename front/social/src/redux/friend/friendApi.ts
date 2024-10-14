@@ -62,7 +62,7 @@ export const friendsApi = apiSlice.injectEndpoints({
     }),
     sendInvite: builder.mutation<Friend, IdFriend>({
       query: ({ id }) => ({
-        url: `/user/invite/${id}`,
+        url: `/friend/invite/${id}`,
         method: 'PUT',
       }),
       async onQueryStarted(arg, { queryFulfilled, dispatch }) {
@@ -83,11 +83,13 @@ export const friendsApi = apiSlice.injectEndpoints({
         }
       }, // <--- Adicionada chave de fechamento aqui
     }), // <--- Adicionado parêntese de fechamento aqui
-    allInvites: builder.query<InvitesResponse, void>({
-      query: () => ({
-        url: '/user/invites',
+    allInvites: builder.query<InvitesResponse, any>({
+      query: (params) => ({
+        url: '/friend/invites',
         method: 'GET',
+        params,
       }),
+      providesTags: ['posts'],
       // async onQueryStarted(arg, { queryFulfilled, dispatch }) {
       //   try {
       //     const { data } = await queryFulfilled;
@@ -100,22 +102,17 @@ export const friendsApi = apiSlice.injectEndpoints({
     }),
     acceptInvite: builder.mutation<void, IdFriend>({
       query: ({ id }) => ({
-        url: `/user/accept/${id}`,
+        url: `/friend/accept/${id}`,
         method: 'PUT',
       }),
+      invalidatesTags: ['invites'],
     }),
-    allFriends: builder.query<FriendsResponse, void>({
-      // Atualizado para não esperar argumentos
-      query: () => ({
-        url: '/user/friends',
-        method: 'GET',
+    declineInvite: builder.mutation<void, IdFriend>({
+      query: ({ id }) => ({
+        url: `/friend/decline/${id}`,
+        method: 'PUT',
       }),
-    }),
-    getFriendPosts: builder.query<Post[], void>({
-      query: () => ({
-        url: 'user/friends/posts',
-        method: 'GET',
-      }),
+      invalidatesTags: ['invites'],
     }),
   }),
 });
@@ -124,7 +121,6 @@ export const {
   useSearchFriendsQuery,
   useSendInviteMutation,
   useAcceptInviteMutation,
+  useDeclineInviteMutation,
   useAllInvitesQuery,
-  useAllFriendsQuery,
-  useGetFriendPostsQuery,
 } = friendsApi;

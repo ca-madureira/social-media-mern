@@ -62,8 +62,7 @@ export const sendForgotPasswordCode = async (req: Request, res: Response) => {
 
 export const verifyCode = async (req: Request, res: Response) => {
   const { email, code } = req.body;
-  console.log('email', email);
-  console.log('code', code);
+
   try {
     await verifyCodeService({ email, code });
 

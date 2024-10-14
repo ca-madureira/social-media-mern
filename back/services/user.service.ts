@@ -29,7 +29,13 @@ export const searchUserService = async (data: UserDataSearch) => {
       { name: { $regex: nameRegex, $options: 'i' } },
       { email: { $regex: emailRegex, $options: 'i' } },
     ],
-  }).select('name email'); // Retorna apenas os campos name, email e _id (por padrão)
+  })
+    .select('name email friends') // Seleciona o nome, email e os amigos
+    .populate({
+      path: 'friends', // Campo que está sendo populado
+      select: 'name email', // Campos que você quer retornar dos amigos
+    });
+  // Retorna apenas os campos name, email e _id (por padrão)
   console.log(users);
   return users;
 };

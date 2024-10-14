@@ -221,3 +221,30 @@ export const reactToPost = async (req: Request, res: Response) => {
     return res.status(500).json({ message: 'Erro ao reagir ao post', error });
   }
 };
+
+export const userVotedPost = async (req: Request, res: Response) => {
+  try {
+    const author = req.user?._id;
+    const { id } = req.params; // Extraímos 'id' de req.params
+
+    // Chamando o serviço para deletar o post
+    const post = await Post.findById(id);
+
+    if (!post) {
+      return res.status(404).json({ message: 'Post não encontrado' });
+    }
+
+    // Verifica se o autor já votou (supondo que post.votes seja um array de ObjectIds ou strings)
+    const voted = post.votes.some((vote) =>
+      vote.equals(author as mongoose.Types.ObjectId),
+    );
+
+    res.status(200).json({ voted });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: 'Erro ao deletar post',
+      error: error.message,
+    });
+  }
+};

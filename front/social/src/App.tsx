@@ -1,22 +1,27 @@
-// src/App.tsx
 import React from 'react';
 import { Routes, Route, BrowserRouter as Router } from 'react-router-dom';
-import Login from './pages/Login';
-import Home from './pages/Home';
+import Authentication from './pages/Authentication';
+
 import Friend from './pages/Friend';
 import ProtectedRoute from './components/ProtectedRoute';
-import ModalPassword from './components/ModalPassword';
+
+import { ToastContainer } from 'react-toastify'; // Importando o ToastContainer
+import 'react-toastify/dist/ReactToastify.css'; // Importando o CSS do Toastify
+import Profile from './pages/Profile';
+import ForgotPass from './pages/ForgotPass';
 
 function App() {
   return (
     <Router>
+      <ToastContainer />
+
       <Routes>
         <Route path="/" element={<ProtectedRoute />}>
-          <Route index element={<Home />} />
-          <Route path="friend/:id" element={<Friend />} />
+          <Route index element={<Profile />} />
+          <Route path="friend/:id" element={<Profile />} />
         </Route>
-        <Route path="/login" element={<Login />} />
-        <Route path="/forgotPass" element={<ModalPassword />} />
+        <Route path="/login" element={<Authentication />} />
+        <Route path="/forgotPass" element={<ForgotPass />} />
       </Routes>
     </Router>
   );

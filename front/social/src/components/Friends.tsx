@@ -3,15 +3,14 @@ import { FaSearch } from 'react-icons/fa';
 import { useSearchUsersQuery } from '../redux/auth/authApi';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { setFriend } from '../redux/friend/friendSlice';
-import { useAllFriendsQuery } from '../redux/friend/friendApi';
+import { setUser } from '../redux/friend/userSlice';
+// import { setFriend } from '../redux/friend/friendSlice';
 
-const Friends = () => {
+const Friends = ({ user }: any) => {
   const [searchTerm, setSearchTerm] = useState<string>('');
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { data = { friends: [] } } = useAllFriendsQuery();
   // Fazer a busca na API
   const {
     data: searchResults,
@@ -22,106 +21,66 @@ const Friends = () => {
     { skip: !searchTerm }, // Não faz a busca se searchTerm estiver vazio
   );
 
-  // Dados estáticos dos amigos
-  const friendsList = [
-    {
-      name: 'João Silva',
-      photo: 'https://randomuser.me/api/portraits/men/1.jpg',
-    },
-    {
-      name: 'Maria Oliveira',
-      photo: 'https://randomuser.me/api/portraits/women/2.jpg',
-    },
-    {
-      name: 'Carlos Pereira',
-      photo: 'https://randomuser.me/api/portraits/men/3.jpg',
-    },
-    {
-      name: 'Ana Souza',
-      photo: 'https://randomuser.me/api/portraits/women/4.jpg',
-    },
-    {
-      name: 'Fernanda Lima',
-      photo: 'https://randomuser.me/api/portraits/women/5.jpg',
-    },
-    // Adicione mais amigos se necessário
-  ];
-  console.log('conteudo de lista de amigos', data);
   const handleUserClick = (user: any) => {
-    dispatch(setFriend(user));
+    dispatch(setUser(user));
     navigate(`/friend/${user._id}`);
   };
 
   return (
-    <div className="mt-12 mr-4 border-2 w-[400px]">
-      <div className="flex flex-col items-center gap-2 rounded-md p-2">
-        {/* Campos de busca */}
-        <div className="flex items-center gap-2 w-full mb-4">
-          <input
-            className="border px-2 outline-none p-2 w-3/5"
-            placeholder="Pesquisar por nome..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+    <div className="p-2 w-3/5 shadow-purple-600 shadow-md  bg-white">
+      <div className="flex justify-center">
+        <input
+          className="px-2 outline-none p-2  bg-purple-300 w-3/5 placeholder-white"
+          placeholder="Pesquisar por nome..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
 
-          <button className="bg-purple-400 rounded-md p-2 text-white">
-            <FaSearch />
-          </button>
-        </div>
-
-        {/* Resultados da busca */}
-        {isLoading && <p>Carregando...</p>}
-        {error && <p>Erro ao buscar usuários</p>}
-        {searchTerm &&
-          searchResults?.users &&
-          searchResults.users.length > 0 && (
-            <div className="flex flex-col items-center w-full p-2 mb-4">
-              <h2 className="text-lg font-bold mb-2">Resultados da Busca:</h2>
-              {searchResults.users.map((user: any) => (
-                <div
-                  key={user.id}
-                  className="flex flex-col items-center w-full mb-4 cursor-pointer"
-                  onClick={() => handleUserClick(user)}
-                >
-                  <p className="font-semibold">{user.name}</p>
-                  <p>{user.email}</p>
-                </div>
-              ))}
-            </div>
-          )}
-
-        {/* Lista de amigos */}
-        <h2 className="text-lg font-bold mb-2">Lista de Amigos:</h2>
-        <div className="flex flex-wrap items-center justify-around p-2">
-          {/* {friendsList.slice(0, 6).map((friend, index) => (
-            <div
-              key={index}
-              className="flex flex-col items-center w-24 text-center mb-4"
-            >
-              <img
-                src={friend.photo}
-                alt={friend.name}
-                className="w-full rounded-md w-18 h-18"
-              />
-              <div className="flex items-center gap-2 mt-2">
-                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                <p>{friend.name.split(' ')[0]}</p>
-              </div>
-            </div>
-          ))} */}
-
-          {data?.friends?.length > 0 ? (
-            data.friends.map((invite) => (
-              <div key={invite._id}>
-                <p>Name: {invite.name}</p>
-                <p>Email: {invite.email}</p>
-              </div>
-            ))
-          ) : (
-            <p>No invites available.</p>
-          )}
-        </div>
+        <button className="bg-purple-700 rounded-md p-2 text-white">
+          <FaSearch />
+        </button>
       </div>
+
+      {/* Resultados da busca */}
+      {isLoading && <p>Carregando...</p>}
+      {error && <p>Erro ao buscar usuários</p>}
+      {searchTerm && searchResults?.users && searchResults.users.length > 0 && (
+        <div className="flex flex-col items-center w-full p-2 mb-4">
+          <h2 className="text-lg font-bold mb-2">Resultados da Busca:</h2>
+          {searchResults.users.map((user: any) => (
+            <div
+              key={user.id}
+              className="flex flex-col items-center w-full mb-4 cursor-pointer"
+              onClick={() => handleUserClick(user)}
+            >
+              <p className="font-semibold">{user.name}</p>
+              <p>{user.email}</p>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Lista de amigos */}
+      <h2 className="text-lg font-bold mb-2 font-mooli text-purple-700">
+        Amigos
+      </h2>
+
+      {user?.friends?.length > 0 ? (
+        user.friends.map((friend: any) => (
+          <div
+            key={friend._id}
+            className="bg-purple-300 flex flex-col items-center p-2 cursor-pointer w-24 flex-wrap"
+          >
+            <img
+              className="w-20 h-20 rounded-md"
+              src="https://w7.pngwing.com/pngs/340/946/png-transparent-avatar-user-computer-icons-software-developer-avatar-child-face-heroes-thumbnail.png"
+            />
+            <p className="text-purple-600 font-semibold">{friend.name}</p>
+          </div>
+        ))
+      ) : (
+        <p>Não há amigos</p>
+      )}
     </div>
   );
 };

@@ -7,6 +7,7 @@ import {
   updatePostById,
   votePost,
   reactToPost,
+  userVotedPost,
 } from '../controllers/post.controller';
 
 const postRoute = express.Router();
@@ -22,5 +23,7 @@ postRoute.put('/update/:id', isAuthenticatedToken, updatePostById);
 postRoute.put('/reaction/:id', isAuthenticatedToken, reactToPost);
 
 postRoute.put('/vote/:id', isAuthenticatedToken, votePost);
+
+postRoute.get('/vote/userVoted', isAuthenticatedToken, userVotedPost);
 
 export default postRoute;

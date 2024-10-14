@@ -62,7 +62,7 @@ export const loginUserService = async (
 ): Promise<AuthServiceResponse | null> => {
   const { email, password } = credentials;
 
-  const user = await User.findOne({ email });
+  const user = await User.findOne({ email }).select('+password');
   if (!user) {
     throw new Error('Usuário não encontrado');
   }

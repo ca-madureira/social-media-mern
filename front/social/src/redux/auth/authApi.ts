@@ -1,5 +1,6 @@
 import { apiSlice } from '../api/apiSlice';
 import { userLoggedOut, userRegistration, userLoggedIn } from './authSlice';
+import { setUser } from '../friend/userSlice';
 
 type User = {
   name: string;
@@ -39,7 +40,7 @@ export const authApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     registerUser: builder.mutation<any, RegistrationData>({
       query: (data) => ({
-        url: '/user/create',
+        url: '/auth/create',
         method: 'POST',
         body: data,
       }),
@@ -47,10 +48,12 @@ export const authApi = apiSlice.injectEndpoints({
         try {
           const result = await queryFulfilled;
           console.log('Resultado: ', result);
-          console.log('valores de cadastro de usuario', result.data.user.user);
+          console.log('valores de CADASTRO', result.data.token);
+          console.log('usuario criado: ', result.data.user);
+          console.log('token de usuario logado', result.data.token);
           dispatch(
             userRegistration({
-              token: result.data?.user?.token || '',
+              token: result.data.token || '',
               user: result.data.user || { name: '', email: '', id: '' },
             }),
           );
@@ -59,10 +62,9 @@ export const authApi = apiSlice.injectEndpoints({
         }
       },
     }),
-
     login: builder.mutation<LoginDataResponse, LoginData>({
       query: ({ email, password }) => ({
-        url: '/user/login',
+        url: '/auth/login',
         method: 'POST',
         body: { email, password },
       }),
@@ -70,18 +72,24 @@ export const authApi = apiSlice.injectEndpoints({
         try {
           const result = await queryFulfilled;
 
-          // dispatch(
-          //   userLoggedIn({
-          //     accessToken: result.data?.token || '',
-          //     user: result.data?.user || { name: '', email: '', id: '' },
-          //   }),
-          // );
+          dispatch(
+            userLoggedIn({
+              accessToken: result.data?.token || '',
+              user: result.data?.user || { name: '', email: '', id: '' },
+            }),
+          );
+          dispatch(
+            setUser({
+              _id: result.data.user.id,
+              name: result.data.user.name,
+              email: result.data.user.email,
+            }),
+          );
         } catch (error: any) {
           console.log(error);
         }
       },
     }),
-
     deleteAccount: builder.mutation<void, string>({
       query: (idUser) => ({
         url: `/user/delete/${idUser}`,
@@ -89,7 +97,6 @@ export const authApi = apiSlice.injectEndpoints({
         credentials: 'include' as const,
       }),
     }),
-
     searchUsers: builder.query<
       SearchResponse,
       { name?: string; email?: string }
@@ -106,24 +113,23 @@ export const authApi = apiSlice.injectEndpoints({
         };
       },
     }),
-
     sendForgotPasswordCode: builder.mutation<void, any>({
       query: (data) => ({
-        url: '/user/forgotPass',
+        url: '/auth/forgotPass',
         method: 'POST',
         body: data,
       }),
     }),
     verifyCode: builder.mutation<void, any>({
       query: (data) => ({
-        url: '/user/verifyCode',
+        url: '/auth/verifyCode',
         method: 'POST',
         body: data,
       }),
     }),
     updatePass: builder.mutation<void, any>({
       query: (data) => ({
-        url: '/user/updatePass',
+        url: '/auth/updatePass',
         method: 'PUT',
         body: data,
       }),
