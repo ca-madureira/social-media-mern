@@ -3,12 +3,15 @@ import { apiSlice } from '../api/apiSlice';
 export const profileApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     updateAvatar: builder.mutation({
-      query: (avatar) => ({
-        url: 'update-user-avatar',
+      query: (formData) => ({
+        url: '/user/update-user-avatar',
         method: 'PUT',
-        body: { avatar },
-        credentials: 'include' as const,
+        body: formData,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
       }),
+      invalidatesTags: ['user'],
     }),
   }),
 });

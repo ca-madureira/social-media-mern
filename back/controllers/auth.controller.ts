@@ -8,6 +8,7 @@ import {
   verifyCodeService,
   updateUserPasswordService,
 } from '../services/auth.service';
+import User from '../models/user.model';
 
 export const createUser = async (req: Request, res: Response) => {
   try {
@@ -21,10 +22,10 @@ export const createUser = async (req: Request, res: Response) => {
       httpOnly: true,
       secure: process.env.NODE_ENV !== 'development',
       sameSite: 'strict',
-      maxAge: 7 * 24 * 60 * 60 * 1000, // Tempo de expiração do cookie (7 dias)
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 dias
     });
 
-    // Retorna a resposta com o Access Token
+    // Retorna a resposta com o Access Token e os campos corretos
     res.json({ user, token });
   } catch (error: any) {
     res.status(400).json({ message: error.message });
@@ -70,9 +71,6 @@ export const verifyCode = async (req: Request, res: Response) => {
       success: true,
       message: 'Código verificado com sucesso',
     });
-
-    // Opcional: Apague o token após o uso
-    // await tokenRecord.deleteOne();
   } catch (err: any) {
     console.error('Erro ao verificar o código:', err);
     return res.status(500).json({

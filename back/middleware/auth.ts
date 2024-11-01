@@ -56,7 +56,7 @@ export const signToken = (user: IUser) => {
   return token; // Retorna o Access Token
 };
 
-export const signRefreshToken = (user: IUser) => {
+export const signRefreshToken = (user: any) => {
   const refreshToken = jwt.sign(
     { id: user._id, email: user.email },
     process.env.REFRESH_TOKEN_SECRET as string,

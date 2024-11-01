@@ -14,7 +14,7 @@ const postRoute = express.Router();
 
 postRoute.post('/create', isAuthenticatedToken, createPost);
 
-postRoute.get('/allPosts', isAuthenticatedToken, getUserPosts);
+postRoute.get('/:id', isAuthenticatedToken, getUserPosts);
 
 postRoute.delete('/delete/:id', isAuthenticatedToken, deletePostById);
 
@@ -23,7 +23,5 @@ postRoute.put('/update/:id', isAuthenticatedToken, updatePostById);
 postRoute.put('/reaction/:id', isAuthenticatedToken, reactToPost);
 
 postRoute.put('/vote/:id', isAuthenticatedToken, votePost);
-
-postRoute.get('/vote/userVoted', isAuthenticatedToken, userVotedPost);
 
 export default postRoute;

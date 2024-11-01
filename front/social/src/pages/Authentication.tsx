@@ -11,6 +11,7 @@ import { toast } from 'react-toastify';
 
 const Authentication = () => {
   const [isLogin, setIsLogin] = useState(true);
+  const [userId, setUserId] = useState<string | null>(null);
 
   const {
     register,
@@ -40,9 +41,13 @@ const Authentication = () => {
 
     try {
       if (isLogin) {
-        await login({ email, password }).unwrap();
+        const result = await login({ email, password }).unwrap();
+        setUserId(result.user.id);
+        navigate(`/${result.user.id}`);
       } else {
-        await registerUser({ name, email, password }).unwrap();
+        const result = await registerUser({ name, email, password }).unwrap();
+        setUserId(result.user.id);
+        navigate(`/${result.user.id}`);
       }
     } catch (error) {
       console.error('Erro ao processar a solicitação:', error);
@@ -52,7 +57,6 @@ const Authentication = () => {
   useEffect(() => {
     if (isLoginSuccess) {
       toast.success('Login realizado com sucesso!');
-      navigate('/');
     } else if (isLoginError) {
       toast.error('Erro ao fazer login. Verifique suas credenciais.');
     }
@@ -61,7 +65,6 @@ const Authentication = () => {
   useEffect(() => {
     if (isRegisterSuccess) {
       toast.success('Cadastro realizado com sucesso!');
-      navigate('/');
     } else if (isRegisterError) {
       toast.error('Erro ao cadastrar. Verifique os dados fornecidos.');
     }
@@ -233,7 +236,6 @@ const Authentication = () => {
 
           <img src={social} alt="Social Media" className=" h-auto" />
         </article>
-        {/* <img src={social} alt="Social Media" className="w-1/2 h-auto" /> */}
       </aside>
     </main>
   );

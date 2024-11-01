@@ -1,17 +1,27 @@
 import { useState } from 'react';
 
-interface PostEditProps {
-  setOpenModal: (value: boolean) => void;
+interface UserData {
+  _id: string;
+  name: string;
+  email: string;
+  avatar: string;
+  invites: object[];
+  friends: object[];
 }
 
-const PostEdit = ({ setOpenModal }: PostEditProps) => {
+interface PostEditProps {
+  setOpenModal: (value: boolean) => void;
+  user: UserData;
+}
+
+const PostEdit = ({ user, setOpenModal }: PostEditProps) => {
   const [post, setPost] = useState('');
 
   return (
-    <div className="flex gap-2 bg-white shadow-purple-600 shadow-md p-2">
+    <section className="w-full flex gap-2 bg-white shadow-purple-600 shadow-md p-2">
       <img
-        className="w-12 h-12 rounded-md border-2 border-purple-500"
-        src="https://png.pngtree.com/element_our/png/20181206/female-avatar-vector-icon-png_262142.jpg"
+        className="w-12 h-12 rounded-md border-4 border-purple-200"
+        src={user.avatar}
         alt="User Avatar"
       />
       <input
@@ -22,7 +32,7 @@ const PostEdit = ({ setOpenModal }: PostEditProps) => {
         onFocus={() => setOpenModal(true)}
         className="w-full h-12 resize-none shadow-purple-400 shadow-sm rounded-md outline-none p-2"
       />
-    </div>
+    </section>
   );
 };
 

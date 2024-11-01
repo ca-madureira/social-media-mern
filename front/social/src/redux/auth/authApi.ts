@@ -1,35 +1,30 @@
 import { apiSlice } from '../api/apiSlice';
-import { userLoggedOut, userRegistration, userLoggedIn } from './authSlice';
-import { setUser } from '../friend/userSlice';
+import { userAuthentication } from './authSlice';
+import { setUser } from '../user/userSlice';
 
 type User = {
   name: string;
   email: string;
   id: string;
+  friends: object[];
+  invites: object[];
   avatar: string;
 };
 
-type RegistrationResponse = {
-  user: {
-    token: string;
-    user: User;
-  };
+type AuthResponse = {
+  token: string;
+  user: User;
 };
 
-type RegistrationData = {}; // Atualizado
-
-type LoginData = {
+type AuthData = {
   email: string;
   password: string;
 };
 
-type LoginDataResponse = {
-  token: string;
-  user: {
-    name: string;
-    email: string;
-    id: string;
-  };
+type AuthRegister = {
+  name: string;
+  email: string;
+  password: string;
 };
 
 type SearchResponse = {
@@ -38,7 +33,7 @@ type SearchResponse = {
 
 export const authApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    registerUser: builder.mutation<any, RegistrationData>({
+    registerUser: builder.mutation<AuthResponse, AuthRegister>({
       query: (data) => ({
         url: '/auth/create',
         method: 'POST',
@@ -47,14 +42,31 @@ export const authApi = apiSlice.injectEndpoints({
       async onQueryStarted(arg, { queryFulfilled, dispatch }) {
         try {
           const result = await queryFulfilled;
-          console.log('Resultado: ', result);
-          console.log('valores de CADASTRO', result.data.token);
-          console.log('usuario criado: ', result.data.user);
-          console.log('token de usuario logado', result.data.token);
+
+          console.log('CONTEUDO PARA NAO PERDER: ', result);
+          // console.log('Resultado: ', result);
+          // console.log('valores de CADASTRO', result.data.token);
+          // console.log('usuario criado: ', result.data.user);
+          // console.log('token de usuario logado', result.data.token);
           dispatch(
-            userRegistration({
-              token: result.data.token || '',
-              user: result.data.user || { name: '', email: '', id: '' },
+            userAuthentication({
+              id: result.data.user.id,
+              name: result.data.user.name,
+              email: result.data.user.email,
+              avatar: result.data.user.avatar,
+              friends: result.data.user.friends,
+              invites: result.data.user.invites,
+              token: result.data.token,
+            }),
+          );
+          dispatch(
+            setUser({
+              id: result.data.user.id,
+              name: result.data.user.name,
+              email: result.data.user.email,
+              avatar: result.data.user.avatar,
+              friends: result.data.user.friends,
+              invites: result.data.user.invites,
             }),
           );
         } catch (error: any) {
@@ -62,7 +74,7 @@ export const authApi = apiSlice.injectEndpoints({
         }
       },
     }),
-    login: builder.mutation<LoginDataResponse, LoginData>({
+    login: builder.mutation<AuthResponse, AuthData>({
       query: ({ email, password }) => ({
         url: '/auth/login',
         method: 'POST',
@@ -72,17 +84,27 @@ export const authApi = apiSlice.injectEndpoints({
         try {
           const result = await queryFulfilled;
 
+          console.log('CONTEUDO PARA NAO PERDER: ', result.data.user.id);
+
           dispatch(
-            userLoggedIn({
-              accessToken: result.data?.token || '',
-              user: result.data?.user || { name: '', email: '', id: '' },
+            userAuthentication({
+              id: result.data.user.id,
+              name: result.data.user.name,
+              email: result.data.user.email,
+              avatar: result.data.user.avatar,
+              friends: result.data.user.friends,
+              invites: result.data.user.invites,
+              token: result.data.token,
             }),
           );
           dispatch(
             setUser({
-              _id: result.data.user.id,
+              id: result.data.user.id,
               name: result.data.user.name,
               email: result.data.user.email,
+              avatar: result.data.user.avatar,
+              friends: result.data.user.friends,
+              invites: result.data.user.invites,
             }),
           );
         } catch (error: any) {

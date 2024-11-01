@@ -1,8 +1,9 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { apiSlice } from './api/apiSlice';
 import authReducer, { AuthState } from '../redux/auth/authSlice';
+
 import postReducer, { PostState } from '../redux/post/postSlice';
-import friendReducer, { UserData } from './friend/userSlice';
+import friendReducer, { UserData } from './user/userSlice';
 import notifyReducer from '../redux/notify/notifySlice';
 
 export const store = configureStore({
@@ -17,10 +18,9 @@ export const store = configureStore({
     getDefaultMiddleware().concat(apiSlice.middleware),
 });
 
-// Tipos para uso com TypeScript
 export type RootState = {
   auth: AuthState;
-  post: PostState; // Certifique-se de exportar e usar o tipo correto para o estado do post
+  post: PostState;
   user: UserData;
   notify: AuthState;
   [apiSlice.reducerPath]: ReturnType<typeof apiSlice.reducer>;

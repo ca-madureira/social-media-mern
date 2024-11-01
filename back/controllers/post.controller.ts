@@ -30,40 +30,28 @@ export const createPost = async (
   }
 };
 
-export const getUserPosts = async (
-  req: Request,
-  res: Response,
-): Promise<Response | void> => {
+export const getUserPosts = async (req: Request, res: Response) => {
   try {
-    // Obtém o ID do usuário logado a partir do `req.user`
-    const author = req.user?._id;
+    // Obtém o ID do usuário a partir dos parâmetros da URL
+    const { id } = req.params;
 
-    if (!author) {
-      return res.status(400).json({ message: 'Usuário não autenticado' });
-    }
-
-    // Converte o ID para ObjectId se necessário
-    let authorObjectId: mongoose.Types.ObjectId;
-
-    if (typeof author === 'string') {
-      if (mongoose.Types.ObjectId.isValid(author)) {
-        authorObjectId = new mongoose.Types.ObjectId(author);
-      } else {
-        return res.status(400).json({ message: 'ID de usuário inválido' });
-      }
-    } else if (author instanceof mongoose.Types.ObjectId) {
-      authorObjectId = author;
-    } else {
+    // Verifica se o ID é válido (opcional, mas boa prática)
+    if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ message: 'ID de usuário inválido' });
     }
 
+    // Converte o ID para ObjectId
+    const authorObjectId = new mongoose.Types.ObjectId(id);
+
     // Recupera os posts do usuário
-    const posts = await getUserPostsService({ author: authorObjectId });
+    const posts = await Post.find({ author: authorObjectId })
+      .populate('author', 'name email')
+      .sort('-createdAt');
 
     return res
       .status(200)
       .json({ message: 'Posts retornados com sucesso', posts });
-  } catch (error: unknown) {
+  } catch (error) {
     console.error('Erro ao retornar os posts:', error);
     return res.status(500).json({ message: 'Erro ao retornar os posts' });
   }

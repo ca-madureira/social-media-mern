@@ -6,7 +6,6 @@ export const apiSlice = createApi({
     baseUrl: 'http://localhost:8000',
     credentials: 'include',
     prepareHeaders: (headers) => {
-      // Pegue o token do localStorage
       const token = localStorage.getItem('token');
 
       // Se o token existir, adicione o cabeçalho Authorization
@@ -17,6 +16,6 @@ export const apiSlice = createApi({
       return headers;
     },
   }),
-  tagTypes: ['posts', 'invites'],
+  tagTypes: ['user', 'posts', 'invites'],
   endpoints: () => ({}),
 });

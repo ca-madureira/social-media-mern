@@ -1,38 +1,41 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { useParams } from 'react-router-dom'; // Importe useParams
 import {
   useGetUserPostsQuery,
   useDeletePostByIdMutation,
   useEditPostMutation,
   useVotePostMutation,
-  useReactPostMutation,
-  useUserVotedPostQuery, // Adicionando a query
-} from '../redux/post/postApi'; // substitua com o caminho correto
+} from '../redux/post/postApi';
 import { FaRegHeart, FaEdit, FaHeart } from 'react-icons/fa';
 import { MdDelete } from 'react-icons/md';
 import { RootState } from '../redux/store';
 import calculateTimeAgo from '../utils/calculaTimeAgo';
 import ReactQuill from 'react-quill';
 import { useSelector } from 'react-redux';
+import { useGetUserQuery } from '../redux/user/userApi';
 
-const Post = (props: any) => {
-  const { data, isLoading, isError, refetch } = useGetUserPostsQuery({
-    author: props.userId,
-  });
+interface UserData {
+  id: string;
+  name: string;
+  email: string;
+}
 
-  const auth = useSelector((state: RootState) => state.auth.user.id);
+const Post: React.FC<any> = ({ user }: any) => {
+  const { id } = useParams<{ id: string }>();
+  console.log('ID NA URL', id);
+  const { data, isLoading, isError } = useGetUserPostsQuery({ id });
+
+  const auth = useSelector((state: RootState) => state.auth?.id);
 
   const [deletePostById] = useDeletePostByIdMutation();
   const [editPost] = useEditPostMutation();
   const [votePost] = useVotePostMutation();
-  const [reactPost] = useReactPostMutation();
 
   const [modeEdit, setModeEdit] = useState<string | null>(null);
   const [content, setContent] = useState<string>('');
   const [voteState, setVoteState] = useState<{ [key: string]: boolean }>({});
   const [reaction, setReaction] = useState<{ [key: string]: string }>({});
   const [toggle, setToggle] = useState(false);
-
-  // Preenche o estado de votos ao carregar os posts
 
   if (isLoading) {
     return <p>Carregando posts...</p>;
@@ -42,9 +45,8 @@ const Post = (props: any) => {
     return <p>Erro ao carregar posts.</p>;
   }
 
-  const deletePost = async (id: string) => {
-    await deletePostById(id);
-    refetch();
+  const deletePost = async (postId: string) => {
+    await deletePostById(postId);
   };
 
   const handleEdit = (postId: string, postContent: string) => {
@@ -53,41 +55,31 @@ const Post = (props: any) => {
     setToggle(!toggle);
   };
 
-  const handleContentChange = (content: string) => {
-    setContent(content);
+  const handleContentChange = (newContent: string) => {
+    setContent(newContent);
   };
 
-  const handleSaveEdit = async (id: string) => {
-    await editPost({ id, content });
+  const handleSaveEdit = async (postId: string) => {
+    await editPost({ id: postId, content });
     setModeEdit(null);
-    refetch();
   };
 
-  const handleVote = async (id: string) => {
-    console.log('VERIFICACAO DO CONTEUDO DE DATA', data);
-    await votePost({ id });
+  const handleVote = async (postId: string) => {
+    await votePost({ id: postId });
     setVoteState((prevVoteState) => ({
       ...prevVoteState,
-      [id]: !prevVoteState[id], // Alterna o estado do voto apenas para o post com o ID correspondente
-    }));
-  };
-
-  const handleState = async (id: string, react: string) => {
-    await reactPost({ id, react });
-    setReaction((prev) => ({
-      ...prev,
-      [id]: react,
+      [postId]: !prevVoteState[postId],
     }));
   };
 
   return (
-    <div className="lg:space-y-4">
+    <section className="w-full md:space-y-4">
       {data?.posts.map((post: any, index: any) => (
-        <div
+        <article
           key={index}
           className="bg-white shadow-purple-600 shadow-md rounded-md p-1"
         >
-          <div className="flex gap-2 justify-end">
+          <header className="flex gap-2 justify-end">
             <FaEdit
               className="text-green-500 font-semibold hover:text-green-800 cursor-pointer"
               onClick={() => handleEdit(post._id, post.content)}
@@ -96,29 +88,29 @@ const Post = (props: any) => {
               className="text-red-600 font-semibold hover:text-red-800 cursor-pointer"
               onClick={() => deletePost(post._id)}
             />
-          </div>
-          <div className="flex gap-2 border-b-2 p-1">
+          </header>
+          <section className="flex gap-2 border-b-2 border-purple-200 p-1">
             <img
-              className="w-10 h-10 border-2 border-purple-600 rounded-md"
-              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSEsWHk8I9ffSkzewp-xK6eissGNZm_c9Iocg&s"
+              className="w-10 h-10 border-4 border-purple-200 rounded-md"
+              src={user.avatar}
               alt="User Avatar"
             />
             <div className="text-sm">
               <h2 className="text-purple-700 font-semibold">
                 {post.author.name}
               </h2>
-              <span className="text-gray-500 font-mooli">
+              <span className="text-gray-500 text-xs font-mooli">
                 {calculateTimeAgo(post.createdAt)}
               </span>
             </div>
-          </div>
-          <div>
+          </section>
+          <section>
             <div className="p-4 space-y-2">
               {modeEdit === post._id && toggle ? (
                 <>
                   <ReactQuill value={content} onChange={handleContentChange} />
                   <button
-                    className="bg-purple-500 text-white font-semibold p-2 rounded-md"
+                    className="bg-purple-500 text-white p-2 text-sm font-semibold rounded-md"
                     onClick={() => handleSaveEdit(post._id)}
                   >
                     Atualizar
@@ -131,25 +123,25 @@ const Post = (props: any) => {
                 />
               )}
             </div>
-            <div className="flex">
+            <footer className="flex">
               <button
                 className="flex items-center font-semibold px-2"
                 onClick={() => handleVote(post._id)}
               >
                 {post.votes.some((vote: string) => vote === auth) ? (
-                  <FaHeart className="text-purple-900" />
+                  <FaHeart className="text-purple-500" />
                 ) : (
-                  <FaRegHeart className="text-purple-900" />
+                  <FaRegHeart className="text-purple-500" />
                 )}
               </button>
               {`${post.votes.length} ${
                 post.votes.length === 1 ? 'voto' : 'votos'
               }`}
-            </div>
-          </div>
-        </div>
+            </footer>
+          </section>
+        </article>
       ))}
-    </div>
+    </section>
   );
 };
 

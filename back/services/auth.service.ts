@@ -52,24 +52,52 @@ export const createUserService = async (data: CreateUserData) => {
 
   await newUser.save();
 
-  const token = signToken(newUser);
+  // Populando os campos invites e friends
+  const userWithRelations = await User.findById(newUser._id)
+    .populate({
+      path: 'invites',
+      select: 'name email',
+    })
+    .populate({
+      path: 'friends',
+      select: 'name email',
+    });
 
-  return { user: newUser, token };
+  if (!userWithRelations) {
+    throw new Error('Usuário não encontrado após criação.');
+  }
+
+  // Criando o token
+  const token = signToken(userWithRelations);
+
+  // Garantindo que o retorno tenha a estrutura correta
+  return {
+    token,
+    user: {
+      id: userWithRelations._id, // Convertendo _id para string e chamando de id
+      name: userWithRelations.name,
+      email: userWithRelations.email,
+      friends: userWithRelations.friends,
+      invites: userWithRelations.invites,
+      avatar: userWithRelations.avatar,
+    },
+  };
 };
 
-export const loginUserService = async (
-  credentials: LoginUserData,
-): Promise<AuthServiceResponse | null> => {
+export const loginUserService = async (credentials: LoginUserData) => {
   const { email, password } = credentials;
 
-  const user = await User.findOne({ email }).select('+password');
+  const user = await User.findOne({ email })
+    .select('+password')
+    .populate('invites')
+    .populate('friends');
+
   if (!user) {
     throw new Error('Usuário não encontrado');
   }
 
-  console.log(user);
   const isPasswordValid = await bcrypt.compare(password, user.password);
-  console.log('senha', isPasswordValid);
+
   if (!isPasswordValid) {
     throw new Error('Credenciais inválidas');
   }
@@ -81,7 +109,10 @@ export const loginUserService = async (
     user: {
       name: user.name,
       email: user.email,
-      id: user.id,
+      id: user._id,
+      invites: user.invites,
+      friends: user.friends,
+      avatar: user.avatar,
     },
   };
 };
@@ -93,16 +124,29 @@ export const sendForgotPasswordCodeService = async (email: string) => {
     throw new Error('Usuário não existe');
   }
 
-  const codeValue = Math.floor(Math.random() * 1000000).toString();
-
-  const expiresAt = new Date(Date.now() + 3600000);
-
-  await new PasswordResetToken({
+  const existingToken = await PasswordResetToken.findOne({
     userId: user._id,
-    token: codeValue,
-    expiresAt,
-  }).save();
+    expiresAt: { $gt: new Date() }, // Token ainda válido
+  });
 
+  const codeValue = Math.floor(Math.random() * 1000000).toString();
+  const expiresAt = new Date(Date.now() + 3600000); // 1 hora de validade
+
+  if (existingToken) {
+    // Sobrescrever o token existente
+    existingToken.token = codeValue;
+    existingToken.expiresAt = expiresAt;
+    await existingToken.save();
+  } else {
+    // Criar um novo token se não existir um ativo
+    await new PasswordResetToken({
+      userId: user._id,
+      token: codeValue,
+      expiresAt,
+    }).save();
+  }
+
+  // Enviar o email com o código
   const info = await transport.sendMail({
     from: process.env.NODE_CODE_SENDING_EMAIL_ADDRESS,
     to: user.email,

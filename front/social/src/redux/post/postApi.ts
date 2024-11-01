@@ -1,11 +1,8 @@
 import { apiSlice } from '../api/apiSlice';
 import { getUserPosts } from './postSlice';
-// Importa suas interfaces
 
-// types.ts
 export interface PostData {
   content: string;
-  // Adicione outros campos se necessário
 }
 
 export interface PostState {
@@ -13,7 +10,7 @@ export interface PostState {
 }
 
 export interface AuthorData {
-  author: string; // Use string para ObjectId no front-end
+  author: string;
 }
 
 export interface IdPost {
@@ -30,18 +27,17 @@ const postApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ['posts'],
     }),
-    getUserPosts: builder.query<PostState, AuthorData>({
-      query: (authorData) => ({
-        url: '/posts/allPosts',
+    getUserPosts: builder.query<any, any>({
+      query: ({ id }) => ({
+        url: `/posts/${id}`,
         method: 'GET',
-        params: { author: authorData.author },
       }),
       providesTags: ['posts'],
       async onQueryStarted(arg, { queryFulfilled, dispatch }) {
         try {
           const { data } = await queryFulfilled;
-          console.log('info', data);
-          dispatch(getUserPosts(data)); // Despacha os posts obtidos
+          console.log('INFORMACOES DE RETORNO DO POST:', data);
+          dispatch(getUserPosts(data));
         } catch (error: any) {
           console.error('Erro ao processar a solicitação:', error);
         }
@@ -79,20 +75,6 @@ const postApi = apiSlice.injectEndpoints({
       },
       invalidatesTags: ['posts'],
     }),
-    userVotedPost: builder.query<any, any>({
-      query: (authorData) => ({
-        url: '/vote/userVoted',
-        method: 'GET',
-        params: { author: authorData.author },
-      }),
-    }),
-    reactPost: builder.mutation<void, { id: string; react: string }>({
-      query: ({ id, react }) => ({
-        url: `/posts/reaction/${id}`,
-        method: 'PUT',
-        body: { reaction: react }, // Inclui o body da requisição
-      }),
-    }),
   }),
 });
 
@@ -102,6 +84,4 @@ export const {
   useDeletePostByIdMutation,
   useEditPostMutation,
   useVotePostMutation,
-  useReactPostMutation,
-  useUserVotedPostQuery,
 } = postApi;

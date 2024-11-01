@@ -3,15 +3,15 @@ import { apiSlice } from '../api/apiSlice';
 import { notify } from '../notify/notifySlice';
 
 interface Post {
-  _id: string; // ID do post
-  content: string; // Conteúdo do post
-  likes: string[]; // Array de IDs dos usuários que curtiram o post
+  _id: string;
+  content: string;
+  likes: string[];
   author: {
     _id: string;
     name: string;
-    avatar?: string; // Avatar do autor (se houver)
-  }; // Dados do autor do post
-  createdAt: string; // Data de criação
+    avatar?: string;
+  };
+  createdAt: string;
 }
 
 interface Friend {
@@ -26,7 +26,7 @@ interface SearchParams {
 }
 
 export interface AuthorData {
-  _id: string; // Use string para ObjectId no front-end
+  _id: string;
 }
 
 interface IdFriend {
@@ -44,6 +44,7 @@ interface FriendOficial {
   name?: string;
   email?: string;
 }
+
 interface InvitesResponse {
   invites: FriendInvite[];
 }
@@ -52,7 +53,7 @@ interface FriendsResponse {
   friends: FriendOficial[];
 }
 
-export const friendsApi = apiSlice.injectEndpoints({
+export const userApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     searchFriends: builder.query<Friend[], SearchParams>({
       query: (params) => ({
@@ -62,7 +63,7 @@ export const friendsApi = apiSlice.injectEndpoints({
     }),
     sendInvite: builder.mutation<Friend, IdFriend>({
       query: ({ id }) => ({
-        url: `/friend/invite/${id}`,
+        url: `/user/invite/${id}`,
         method: 'PUT',
       }),
       async onQueryStarted(arg, { queryFulfilled, dispatch }) {
@@ -81,38 +82,45 @@ export const friendsApi = apiSlice.injectEndpoints({
         } catch (error: any) {
           console.error('Erro ao processar a solicitação:', error);
         }
-      }, // <--- Adicionada chave de fechamento aqui
-    }), // <--- Adicionado parêntese de fechamento aqui
+      },
+    }),
     allInvites: builder.query<InvitesResponse, any>({
-      query: (params) => ({
-        url: '/friend/invites',
+      query: ({ id }) => ({
+        url: `/user/invites/${id}`,
         method: 'GET',
-        params,
       }),
-      providesTags: ['posts'],
-      // async onQueryStarted(arg, { queryFulfilled, dispatch }) {
-      //   try {
-      //     const { data } = await queryFulfilled;
-      //     console.log('info do api', data);
-      //     // dispatch(notify(data)); // Despacha os posts obtidos
-      //   } catch (error: any) {
-      //     console.error('Erro ao processar a solicitação:', error);
-      //   }
-      // },
+      providesTags: ['invites'],
+
+      async onQueryStarted(arg, { queryFulfilled, dispatch }) {
+        try {
+          const { data } = await queryFulfilled;
+          console.log('info do api', data);
+          // dispatch(notify(data)); // Despacha os posts obtidos
+        } catch (error: any) {
+          console.error('Erro ao processar a solicitação:', error);
+        }
+      },
     }),
     acceptInvite: builder.mutation<void, IdFriend>({
       query: ({ id }) => ({
-        url: `/friend/accept/${id}`,
+        url: `/user/accept/${id}`,
         method: 'PUT',
       }),
       invalidatesTags: ['invites'],
     }),
     declineInvite: builder.mutation<void, IdFriend>({
       query: ({ id }) => ({
-        url: `/friend/decline/${id}`,
+        url: `/user/decline/${id}`,
         method: 'PUT',
       }),
       invalidatesTags: ['invites'],
+    }),
+    getUser: builder.query<any, any>({
+      query: ({ id }) => ({
+        url: `/user/${id}`,
+        method: 'GET',
+      }),
+      providesTags: ['user'],
     }),
   }),
 });
@@ -123,4 +131,5 @@ export const {
   useAcceptInviteMutation,
   useDeclineInviteMutation,
   useAllInvitesQuery,
-} = friendsApi;
+  useGetUserQuery,
+} = userApi;

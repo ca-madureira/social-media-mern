@@ -7,10 +7,6 @@ export interface IUser extends Document {
   name: string;
   email: string;
   password: string;
-  // avatar: {
-  //   public_id: string;
-  //   url: string;
-  // };
   avatar: string;
   invites: mongoose.Types.ObjectId[];
   friends: mongoose.Types.ObjectId[];
@@ -41,6 +37,7 @@ const userSchema: Schema<IUser> = new mongoose.Schema(
     },
     avatar: {
       type: String,
+      default: '',
     },
     invites: [
       {

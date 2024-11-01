@@ -1,18 +1,21 @@
-// src/redux/friendSlice.ts
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 export interface UserData {
-  _id: string;
+  id: string;
   name: string;
   email: string;
+  avatar: string; // Adicione o campo avatar aqui
   friends: object[];
+  invites: object[];
 }
 
 const initialState: UserData = {
-  _id: '',
+  id: '',
   name: '',
   email: '',
+  avatar: '',
   friends: [],
+  invites: [],
 };
 
 const UserSlice = createSlice({
@@ -21,7 +24,6 @@ const UserSlice = createSlice({
   reducers: {
     setUser: (state, action: PayloadAction<UserData>) => {
       return { ...state, ...action.payload };
-      console.log('CONTEUDO DE AGORA', action.payload);
     },
   },
 });
