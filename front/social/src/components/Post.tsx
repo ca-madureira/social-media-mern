@@ -12,13 +12,12 @@ import { RootState } from '../redux/store';
 import calculateTimeAgo from '../utils/calculaTimeAgo';
 import ReactQuill from 'react-quill';
 import { useSelector } from 'react-redux';
-import { useGetUserQuery } from '../redux/user/userApi';
 
-interface UserData {
-  id: string;
-  name: string;
-  email: string;
-}
+// interface UserData {
+//   id: string;
+//   name: string;
+//   email: string;
+// }
 
 const Post: React.FC<any> = ({ user }: any) => {
   const { id } = useParams<{ id: string }>();
@@ -34,7 +33,7 @@ const Post: React.FC<any> = ({ user }: any) => {
   const [modeEdit, setModeEdit] = useState<string | null>(null);
   const [content, setContent] = useState<string>('');
   const [voteState, setVoteState] = useState<{ [key: string]: boolean }>({});
-  const [reaction, setReaction] = useState<{ [key: string]: string }>({});
+  // const [reaction, setReaction] = useState<{ [key: string]: string }>({});
   const [toggle, setToggle] = useState(false);
 
   if (isLoading) {
