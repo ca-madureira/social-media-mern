@@ -99,7 +99,7 @@ O AmizApp é uma rede social totalmente funcional que criei para aprimorar minha
 
 
 - **Comentários em Posts:** Adicione e visualize comentários nos posts para facilitar o engajamento e discussões.
-- **Notificações Avançadas:** Receba notificações detalhadas sobre quem votou e quem comentou em seus posts, garantindo um maior controle sobre as interações.
+- **Notificações Avançadas:** Receba notificações detalhadas sobre quem votou e quem comentou em seus posts.
 - **Sistema de Chat:** Interaja em tempo real com amigos e membros da comunidade através de um sistema de chat completo.
 - **Criação de Grupos:**  Crie e participe de grupos com interesses em comum.
 - **Lojinha Virtual:** Permite que os usuários criem uma loja dentro da plataforma para vender produtos ou serviços.
