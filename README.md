@@ -93,12 +93,6 @@ O AmizApp é uma rede social totalmente funcional que criei para aprimorar minha
      npm run start
      ```
 
-##  🧪 Testes
-
-```bash
-# Ainda em desenvolvimento
-```
-
 ##  🚀 Próximos Passos / Roadmap
 
 **Funcionalidades Futuras e Melhorias Planejadas:**
