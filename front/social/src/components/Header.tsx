@@ -34,11 +34,7 @@ const Header: FC = () => {
 
   const [searchTerm, setSearchTerm] = useState<string>('');
 
-  const {
-    data: searchResults,
-    error,
-    isLoading,
-  } = useSearchUsersQuery(
+  const { data: searchResults } = useSearchUsersQuery(
     { name: searchTerm, email: searchTerm },
     { skip: !searchTerm },
   );

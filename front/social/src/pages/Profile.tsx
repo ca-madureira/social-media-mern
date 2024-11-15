@@ -15,11 +15,7 @@ const Profile = () => {
   const auth = useSelector((state: RootState) => state.auth);
   const { id } = useParams();
 
-  const {
-    data: friend,
-    error,
-    isLoading,
-  } = useGetUserQuery({ id }, { skip: !id });
+  const { data: friend } = useGetUserQuery({ id }, { skip: !id });
 
   const isLoggedIn = !id || auth?.id === id;
   const userData = friend;

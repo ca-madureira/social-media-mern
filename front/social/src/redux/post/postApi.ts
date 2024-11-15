@@ -33,7 +33,7 @@ const postApi = apiSlice.injectEndpoints({
         method: 'GET',
       }),
       providesTags: ['posts'],
-      async onQueryStarted(arg, { queryFulfilled, dispatch }) {
+      async onQueryStarted(_, { queryFulfilled, dispatch }) {
         try {
           const { data } = await queryFulfilled;
           console.log('INFORMACOES DE RETORNO DO POST:', data);
@@ -64,7 +64,7 @@ const postApi = apiSlice.injectEndpoints({
         method: 'PUT',
         credentials: 'include' as const,
       }),
-      async onQueryStarted(arg, { queryFulfilled, dispatch }) {
+      async onQueryStarted(_, { queryFulfilled }) {
         try {
           const result = await queryFulfilled;
 

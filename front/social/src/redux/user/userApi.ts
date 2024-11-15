@@ -1,18 +1,17 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { apiSlice } from '../api/apiSlice';
 import { notify } from '../notify/notifySlice';
 
-interface Post {
-  _id: string;
-  content: string;
-  likes: string[];
-  author: {
-    _id: string;
-    name: string;
-    avatar?: string;
-  };
-  createdAt: string;
-}
+// interface Post {
+//   _id: string;
+//   content: string;
+//   likes: string[];
+//   author: {
+//     _id: string;
+//     name: string;
+//     avatar?: string;
+//   };
+//   createdAt: string;
+// }
 
 interface Friend {
   id: string;
@@ -39,19 +38,19 @@ interface FriendInvite {
   _id?: string;
 }
 
-interface FriendOficial {
-  _id?: string;
-  name?: string;
-  email?: string;
-}
+// interface FriendOficial {
+//   _id?: string;
+//   name?: string;
+//   email?: string;
+// }
 
 interface InvitesResponse {
   invites: FriendInvite[];
 }
 
-interface FriendsResponse {
-  friends: FriendOficial[];
-}
+// interface FriendsResponse {
+//   friends: FriendOficial[];
+// }
 
 export const userApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -66,7 +65,7 @@ export const userApi = apiSlice.injectEndpoints({
         url: `/user/invite/${id}`,
         method: 'PUT',
       }),
-      async onQueryStarted(arg, { queryFulfilled, dispatch }) {
+      async onQueryStarted(_, { queryFulfilled, dispatch }) {
         try {
           const result = await queryFulfilled;
           // Corrigido para usar a estrutura correta de dispatch
@@ -91,7 +90,7 @@ export const userApi = apiSlice.injectEndpoints({
       }),
       providesTags: ['invites'],
 
-      async onQueryStarted(arg, { queryFulfilled, dispatch }) {
+      async onQueryStarted(_, { queryFulfilled }) {
         try {
           const { data } = await queryFulfilled;
           console.log('info do api', data);
