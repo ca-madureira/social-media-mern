@@ -32,7 +32,7 @@ const Post: React.FC<any> = ({ user }: any) => {
 
   const [modeEdit, setModeEdit] = useState<string | null>(null);
   const [content, setContent] = useState<string>('');
-  const [voteState, setVoteState] = useState<{ [key: string]: boolean }>({});
+  // const [voteState, setVoteState] = useState<{ [key: string]: boolean }>({});
   // const [reaction, setReaction] = useState<{ [key: string]: string }>({});
   const [toggle, setToggle] = useState(false);
 
@@ -65,10 +65,10 @@ const Post: React.FC<any> = ({ user }: any) => {
 
   const handleVote = async (postId: string) => {
     await votePost({ id: postId });
-    setVoteState((prevVoteState) => ({
-      ...prevVoteState,
-      [postId]: !prevVoteState[postId],
-    }));
+    // setVoteState((prevVoteState) => ({
+    //   ...prevVoteState,
+    //   [postId]: !prevVoteState[postId],
+    // }));
   };
 
   return (

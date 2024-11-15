@@ -11,7 +11,6 @@ import { toast } from 'react-toastify';
 
 const Authentication = () => {
   const [isLogin, setIsLogin] = useState(true);
-  const [userId, setUserId] = useState<string | null>(null);
 
   const {
     register,
@@ -42,11 +41,11 @@ const Authentication = () => {
     try {
       if (isLogin) {
         const result = await login({ email, password }).unwrap();
-        setUserId(result.user.id);
+
         navigate(`/${result.user.id}`);
       } else {
         const result = await registerUser({ name, email, password }).unwrap();
-        setUserId(result.user.id);
+
         navigate(`/${result.user.id}`);
       }
     } catch (error) {
