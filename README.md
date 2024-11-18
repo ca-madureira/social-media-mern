@@ -70,15 +70,22 @@ O AmizApp é uma rede social totalmente funcional que criei para aprimorar minha
 3. **Configurações:**
    - Crie um arquivo `.env` na raiz do projeto **backend** (`.env`)  e adicione as seguintes variáveis de ambiente, ajustando os valores conforme necessário:
      ```
-     PORT=sua_porta_backend (ex:5000)
-     ORIGIN=sua_url_frontend
-     DB_URI=sua_string_de_conexao_mongodb
-     JWT_SECRET=sua_chave_secreta_para_jwt
+     PORT= (ex:5000)
+     ORIGIN=
+     DB_URI=
+     JWT_SECRET=
+     ACCESS_TOKEN_SECRET=
+     REFRESH_TOKEN_SECRET=
+     CLOUD_NAME=
+     CLOUD_API_KEY=
+     CLOUD_SECRET_KEY=
+     NODE_CODE_SENDING_EMAIL_ADDRESS=
+     NODE_CODE_SENDING_EMAIL_PASSWORD=
      
      ```
    - Crie um arquivo `.env.local` na raiz do projeto **frontend** (`.env.local`) e adicione:
      ```
-     REACT_APP_API_URL=http://localhost:5000
+     VITE_REACT_APP_BACKEND_BASEURL=http://localhost:5000
      ```
 
 4. **Inicializar a Aplicação:**
