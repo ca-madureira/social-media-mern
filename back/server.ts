@@ -1,9 +1,11 @@
-require('dotenv').config(); // Deve ser chamado no topo do arquivo
+require('dotenv').config();
 
 import { app } from './app';
 import connectDB from './utils/db';
 
-app.listen(process.env.PORT, () => {
-  console.log(`Servidor está conectado na porta ${process.env.PORT}`);
+const port = process.env.PORT || 3000;
+
+app.listen(port, () => {
+  // console.log(`Servidor está rodando na porta ${port}`);
   connectDB();
 });
