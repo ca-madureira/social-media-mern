@@ -104,7 +104,17 @@ O AmizApp é uma rede social totalmente funcional que criei para aprimorar minha
 - **Criação de Grupos:**  Crie e participe de grupos com interesses em comum.
 - **Lojinha Virtual:** Permite que os usuários criem uma loja dentro da plataforma para vender produtos ou serviços.
 
-##  Licença
 
-Este projeto está licenciado sob a Licença MIT. Consulte o arquivo [LICENSE](LICENSE) para obter mais detalhes.
+
+
+<div style="display: flex; justify-content: center; gap: 10px;">
+
+<img src="https://github.com/user-attachments/assets/740744f7-e231-43f8-8a05-75f05017ed49" width="500" />
+
+<img src="https://github.com/user-attachments/assets/c1e6fbbb-ac02-4946-8a59-5a8f812813e6" width="500" />
+
+</div>
+
+
+
 
