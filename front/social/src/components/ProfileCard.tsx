@@ -74,7 +74,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ user, isLoggedIn }) => {
         <img
           src={
             user?.avatar ||
-            'https://www.designi.com.br/images/preview/12040180.jpg'
+            'https://cdn-icons-png.flaticon.com/512/6188/6188625.png'
           }
           className="w-24 h-24 rounded-md border-2 border-purple-200 cursor-pointer"
           alt={`Foto de perfil de ${user?.name}`}

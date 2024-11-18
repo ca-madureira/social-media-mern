@@ -16,7 +16,11 @@ app.use(cookieParser());
 
 app.use(
   cors({
-    origin: ['http://localhost:5173', 'http://127.0.0.1:5173'],
+    origin: [
+      'http://localhost:5173',
+      'http://127.0.0.1:5173',
+      'https://social-media-mern-infwjkxb2-ca-madureiras-projects.vercel.app',
+    ],
     credentials: true,
   }),
 );

@@ -20,8 +20,12 @@ const PostEdit = ({ user, setOpenModal }: PostEditProps) => {
   return (
     <section className="w-full flex gap-2 bg-white shadow-purple-600 shadow-md p-2">
       <img
-        className="w-12 h-12 rounded-md border-4 border-purple-200"
-        src={user.avatar}
+        className="w-14 h-12 rounded-md border-4 border-purple-200"
+        src={`${
+          user?.avatar
+            ? user?.avatar
+            : 'https://cdn-icons-png.flaticon.com/512/6188/6188625.png'
+        }`}
         alt="User Avatar"
       />
       <input
