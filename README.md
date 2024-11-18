@@ -40,6 +40,7 @@ O AmizApp é uma rede social totalmente funcional que criei para aprimorar minha
 - **TypeScript:**  Traz tipagem estática para o backend, melhorando a qualidade do código.
 - **Mongoose:**  Um ODM (Object Data Modeling) que facilita a interação com o banco de dados MongoDB.
 - **Express.js:**  Um framework web rápido e minimalista para Node.js, ideal para construir APIs RESTful.
+- **Cloudinary:** Um serviço de gerenciamento de mídia usado para armazenar e entregar imagens de forma otimizada e segura, ideal para personalização de perfis.
 
 **Banco de Dados:**
 
