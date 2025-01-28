@@ -54,11 +54,11 @@ export const deleteUserById = async (req: Request, res: Response) => {
 
 export const searchUser = async (req: Request, res: Response) => {
   try {
-    // Convert query parameters to strings or provide default empty strings
+    
     const name = (req.query.name as string) || '';
     const email = (req.query.email as string) || '';
 
-    // Await the result from searchUserService
+    
     const users = await searchUserService({ name, email });
 
     return res.status(200).json({ users });
