@@ -1,13 +1,19 @@
-import { useState, useEffect } from 'react';
-import social from '../assets/social-media.svg';
-import { useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from "react";
+import social from "../assets/social-media.svg";
+import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 import {
   useLoginMutation,
   useRegisterUserMutation,
-} from '../redux/auth/authApi';
+} from "../redux/auth/authApi";
 
-import { toast } from 'react-toastify';
+import { toast } from "react-toastify";
+
+interface UserData {
+  name: string;
+  email: string;
+  password: string;
+}
 
 const Authentication = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -19,12 +25,12 @@ const Authentication = () => {
     getValues,
   } = useForm({
     defaultValues: {
-      name: '',
-      email: '',
-      password: '',
-      confirmPassword: '',
+      name: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
     },
-    mode: 'onChange',
+    mode: "onChange",
   });
 
   const [login, { isSuccess: isLoginSuccess, isError: isLoginError }] =
@@ -35,7 +41,7 @@ const Authentication = () => {
   ] = useRegisterUserMutation();
   const navigate = useNavigate();
 
-  const submitHandler = async (data: any) => {
+  const submitHandler = async (data: UserData) => {
     const { name, email, password } = data;
 
     try {
@@ -49,59 +55,59 @@ const Authentication = () => {
         navigate(`/${result.user.id}`);
       }
     } catch (error) {
-      console.error('Erro ao processar a solicitação:', error);
+      console.error("Erro ao processar a solicitação:", error);
     }
   };
 
   useEffect(() => {
     if (isLoginSuccess) {
-      toast.success('Login realizado com sucesso!');
+      toast.success("Login realizado com sucesso!");
     } else if (isLoginError) {
-      toast.error('Erro ao fazer login. Verifique suas credenciais.');
+      toast.error("Erro ao fazer login. Verifique suas credenciais.");
     }
   }, [isLoginSuccess, isLoginError, navigate]);
 
   useEffect(() => {
     if (isRegisterSuccess) {
-      toast.success('Cadastro realizado com sucesso!');
+      toast.success("Cadastro realizado com sucesso!");
     } else if (isRegisterError) {
-      toast.error('Erro ao cadastrar. Verifique os dados fornecidos.');
+      toast.error("Erro ao cadastrar. Verifique os dados fornecidos.");
     }
   }, [isRegisterSuccess, isRegisterError, navigate]);
 
   const handleToggleModal = () => {
-    navigate('/forgotPass');
+    navigate("/forgotPass");
   };
 
   return (
     <main className="flex flex-col bg-purple-200 lg:flex-row order-first lg:p-16 rounded-md border-2 justify-center h-screen">
       <form
-        className="flex flex-col order-last h-auto border shadow-lg bg-white border-purple-200 justify-center items-center lg:w-1/3 p-6 "
+        className="flex flex-col order-last h-auto border shadow-lg bg-white border-purple-200 justify-center items-center lg:w-1/3 p-6"
         onSubmit={handleSubmit(submitHandler)}
       >
         <header className="flex">
           <h1 className="text-2xl mb-4 font-mooli text-purple-500 font-semibold">
-            {isLogin ? 'Entrar na conta' : 'Criar conta'}
+            {isLogin ? "Entrar na conta" : "Criar conta"}
           </h1>
         </header>
-        <fieldset className="flex flex-col space-y-2">
+        <fieldset className="flex flex-col space-y-2 w-[68%]">
           {!isLogin && (
             <input
               type="text"
               id="name"
-              {...register('name', {
+              {...register("name", {
                 minLength: {
                   value: 3,
-                  message: 'Nome deve conter ao menos 3 caracteres',
+                  message: "Nome deve conter ao menos 3 caracteres",
                 },
                 required: {
                   value: true,
-                  message: 'Nome é obrigatório',
+                  message: "Nome é obrigatório",
                 },
               })}
               placeholder="Nome"
               className={`p-2 w-full border rounded  border-purple-500 text-purple-500 font-mooli outline-none ${
-                errors.name ? 'border-red-500' : 'border-[#c3cad9]'
+                errors.name ? "border-red-500" : "border-[#c3cad9]"
               }`}
             />
           )}
@@ -111,19 +117,19 @@ const Authentication = () => {
 
           <input
             className={`p-2 border rounded w-full border-purple-500 text-purple-500 font-mooli outline-none ${
-              errors.email ? 'border-red-500' : 'border-[#c3cad9]'
+              errors.email ? "border-red-500" : "border-[#c3cad9]"
             }`}
             type="email"
             id="email"
-            {...register('email', {
+            {...register("email", {
               pattern: {
                 value:
                   /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
-                message: 'Insira um email válido',
+                message: "Insira um email válido",
               },
               required: {
                 value: true,
-                message: 'Email é obrigatório',
+                message: "Email é obrigatório",
               },
             })}
             placeholder="Email"
@@ -135,19 +141,19 @@ const Authentication = () => {
           <input
             type="password"
             id="password"
-            {...register('password', {
+            {...register("password", {
               required: {
                 value: true,
-                message: 'Senha é obrigatória',
+                message: "Senha é obrigatória",
               },
               minLength: {
                 value: 6,
-                message: 'Senha deve conter ao menos 6 caracteres',
+                message: "Senha deve conter ao menos 6 caracteres",
               },
             })}
             placeholder="Senha"
             className={`p-2 border rounded w-full border-purple-500 text-purple-500 font-mooli outline-none ${
-              errors.password ? 'border-red-500' : 'border-[#c3cad9]'
+              errors.password ? "border-red-500" : "border-[#c3cad9]"
             }`}
           />
           {errors.password?.message && (
@@ -161,19 +167,19 @@ const Authentication = () => {
               <input
                 type="password"
                 id="confirmPassword"
-                {...register('confirmPassword', {
+                {...register("confirmPassword", {
                   required: {
                     value: true,
-                    message: 'Confirmação de senha é obrigatória',
+                    message: "Confirmação de senha é obrigatória",
                   },
                   validate: (value) => {
-                    const password = getValues('password');
-                    return value === password || 'Senhas não coincidem';
+                    const password = getValues("password");
+                    return value === password || "Senhas não coincidem";
                   },
                 })}
                 placeholder="Repita sua senha"
                 className={`p-2 mt-2 border rounded w-full border-purple-500 text-purple-500 font-mooli outline-none ${
-                  errors.confirmPassword ? 'border-red-500' : 'border-[#c3cad9]'
+                  errors.confirmPassword ? "border-red-500" : "border-[#c3cad9]"
                 }`}
               />
 
@@ -197,10 +203,10 @@ const Authentication = () => {
 
           <button
             type="submit"
-            className="font-mooli font-semibold p-2 border border-purple-500 text-purple-500 rounded hover:bg-purple-500 hover:text-white"
+            className="font-mooli font-semibold p-2 text-purple-500 rounded bg-purple-500 hover:bg-purple-700 text-white cursor-pointer"
             disabled={!isValid}
           >
-            {isLogin ? 'Entrar' : 'Criar'}
+            {isLogin ? "Entrar" : "Criar"}
           </button>
         </fieldset>
       </form>

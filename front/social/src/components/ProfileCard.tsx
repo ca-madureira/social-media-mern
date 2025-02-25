@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
-import { useSendInviteMutation } from '../redux/user/userApi';
-import { useSelector } from 'react-redux';
-import { RootState } from '../redux/store';
-import { RiEmotionHappyFill } from 'react-icons/ri';
-import { AiOutlineEdit } from 'react-icons/ai';
-import { useUpdateAvatarMutation } from '../redux/profile/profileApi';
+import React, { useState } from "react";
+import { useSendInviteMutation } from "../redux/user/userApi";
+import { useSelector } from "react-redux";
+import { RootState } from "../redux/store";
+import { RiEmotionHappyFill } from "react-icons/ri";
+import { AiOutlineEdit } from "react-icons/ai";
+import { useUpdateAvatarMutation } from "../redux/profile/profileApi";
 
 interface UserData {
   _id: string;
@@ -27,10 +27,10 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ user, isLoggedIn }) => {
   const [updateAvatar] = useUpdateAvatarMutation();
 
   const isInvite = user?.invites?.some(
-    (invite: any) => invite.email === auth?.email,
+    (invite: any) => invite.email === auth?.email
   );
   const isFriend = user?.friends?.some(
-    (friend: any) => friend.email === auth?.email,
+    (friend: any) => friend.email === auth?.email
   );
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -45,7 +45,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ user, isLoggedIn }) => {
     reader.readAsDataURL(file);
     reader.onloadend = async () => {
       const base64data = reader.result;
-      if (typeof base64data === 'string') {
+      if (typeof base64data === "string") {
         await uploadAvatar(base64data);
       }
     };
@@ -55,7 +55,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ user, isLoggedIn }) => {
     try {
       await updateAvatar({ avatar: base64data }).unwrap();
     } catch (error) {
-      console.error('Erro ao atualizar a imagem de perfil', error);
+      console.error("Erro ao atualizar a imagem de perfil", error);
     }
   };
 
@@ -64,19 +64,19 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ user, isLoggedIn }) => {
       await sendInvite({ id: user._id }).unwrap();
       setMsg(true);
     } catch (err) {
-      console.error('Falha ao enviar o convite:', err);
+      console.error("Falha ao enviar o convite:", err);
     }
   };
 
   return (
-    <aside className="h-2/5 flex flex-col bg-white shadow-purple-600 shadow-md space-y-6 items-center p-4">
+    <aside className="h-2/5 flex flex-col bg-white shadow-purple-600 shadow-md space-y-6 items-center p-4 mt-2">
       <div className="relative group">
         <img
           src={
             user?.avatar ||
-            'https://cdn-icons-png.flaticon.com/512/6188/6188625.png'
+            "https://cdn-icons-png.flaticon.com/512/6188/6188625.png"
           }
-          className="w-24 h-24 rounded-md border-2 border-purple-200 cursor-pointer"
+          className="w-24 h-26 rounded-md border-2 border-purple-200 cursor-pointer"
           alt={`Foto de perfil de ${user?.name}`}
         />
         {isLoggedIn && (
@@ -110,18 +110,18 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ user, isLoggedIn }) => {
               <RiEmotionHappyFill className="text-purple-500 w-6 h-6" /> Amigos
             </p>
           ) : isInvite ? (
-            <p className="bg-purple-400 text-white font-semibold px-2 rounded-md uppercase">
+            <p className="bg-purple-400 text-white font-semibold px-2 rounded-md uppercase py-2">
               Convite enviado
             </p>
           ) : (
             <button
               className={`p-2 text-white font-semibold ${
-                msg ? 'bg-green-400' : 'bg-purple-500'
+                msg ? "bg-green-400" : "bg-purple-500"
               }`}
               onClick={sendInviteFriend}
               disabled={isLoading}
             >
-              {isLoading ? 'Enviando...' : msg ? 'Enviado' : 'Fazer Amizade'}
+              {isLoading ? "Enviando..." : msg ? "Enviado" : "Fazer Amizade"}
             </button>
           )}
         </>

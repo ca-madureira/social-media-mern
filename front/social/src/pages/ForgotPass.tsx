@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, ChangeEvent } from "react";
 import { useForm } from "react-hook-form";
 import {
   useSendForgotPasswordCodeMutation,
@@ -34,7 +34,7 @@ const ForgotPass = () => {
 
   const otpRefs = useRef([]);
 
-  const handleSendEmail = async (data) => {
+  const handleSendEmail = async (data: string) => {
     await sendForgotPasswordCode({ email: data.email }).unwrap();
     setStep(2);
   };
@@ -62,7 +62,7 @@ const ForgotPass = () => {
     }
   };
 
-  const handleOtpChange = (e, index) => {
+  const handleOtpChange = (e: ChangeEvent<HTMLInputElement>, index: number) => {
     const value = e.target.value;
     if (/[^0-9]/.test(value)) return; // Prevent invalid input (only numbers)
 
@@ -75,7 +75,7 @@ const ForgotPass = () => {
     }
   };
 
-  const handleKeyDown = (e, index) => {
+  const handleKeyDown = (e: KeyboardEvent, index: number) => {
     if (e.key === "Backspace" && !otp[index]) {
       if (index > 0) {
         otpRefs.current[index - 1].focus(); // Move to previous input field
@@ -120,7 +120,7 @@ const ForgotPass = () => {
                 </p>
               )}
               <button
-                className="bg-purple-500 text-white font-semibold p-2 rounded-md"
+                className="bg-purple-500 hover:bg-purple-700 text-white font-semibold p-2 rounded-md"
                 type="submit"
               >
                 {isLoading ? "Enviando..." : "Enviar e-mail"}
@@ -145,7 +145,7 @@ const ForgotPass = () => {
                 ))}
               </div>
               <button
-                className="bg-purple-500 text-white font-semibold rounded-md p-2"
+                className="bg-purple-500 hover:bg-purple-700 text-white font-semibold rounded-md p-2"
                 type="submit"
               >
                 Enviar código
@@ -197,7 +197,7 @@ const ForgotPass = () => {
                 </p>
               )}
               <button
-                className="bg-purple-500 text-white font-semibold p-2 text-center w-[80%] rounded-md"
+                className="bg-purple-500 hover:bg-purple-700 text-white font-semibold p-2 text-center w-[80%] rounded-md"
                 type="submit"
               >
                 Salvar senha

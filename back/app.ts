@@ -4,8 +4,10 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import userRouter from "./routes/user.route";
 import postRoute from "./routes/postRoute";
-import authRoute from "./routes/auth.route";
+import messageRoute from "./routes/message.route";
 import authRouter from "./routes/auth.route";
+// import { app } from "./socket";
+import conversationRoute from "./routes/conversation.route";
 
 export const app = express();
 
@@ -17,7 +19,7 @@ app.use(cookieParser());
 app.use(
   cors({
     origin: ["http://localhost:5174", "http://localhost:5173"],
-    methods: ["POST", "GET", "PUT"],
+    methods: ["POST", "GET", "PUT", "OPTIONS"],
     credentials: true,
   })
 );
@@ -31,3 +33,5 @@ console.log("Cloudinary Config:", {
 app.use("/user", userRouter);
 app.use("/posts", postRoute);
 app.use("/auth", authRouter);
+app.use("/conversations", conversationRoute);
+app.use("/messages", messageRoute);

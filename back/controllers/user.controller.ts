@@ -1,14 +1,14 @@
-import { NextFunction, Request, Response } from 'express';
-import { signToken } from '../middleware/token';
-import bcrypt from 'bcryptjs';
+import { NextFunction, Request, Response } from "express";
+import { signToken } from "../middleware/token";
+import bcrypt from "bcryptjs";
 
-import mongoose, { mongo } from 'mongoose';
-import createToken from '../middleware/createToken';
-import PasswordResetToken from '../models/passwordReset.model';
-import cloudinary from '../utils/cloudinary';
+import mongoose, { mongo } from "mongoose";
+import createToken from "../middleware/createToken";
+import PasswordResetToken from "../models/passwordReset.model";
+import cloudinary from "../utils/cloudinary";
 
-import { deleteUserByIdService } from '../services/user.service';
-import User, { IUser } from '../models/user.model';
+import { deleteUserByIdService } from "../services/user.service";
+import User, { IUser } from "../models/user.model";
 import {
   searchUserService,
   sendInviteService,
@@ -17,9 +17,9 @@ import {
   allFriendsService,
   getFriendPostsService,
   declineInviteService,
-} from '../services/user.service';
-import Post from '../models/post.model';
-import transport from '../middleware/sendMail';
+} from "../services/user.service";
+import Post from "../models/post.model";
+import transport from "../middleware/sendMail";
 
 export const deleteUserById = async (req: Request, res: Response) => {
   try {
@@ -28,7 +28,7 @@ export const deleteUserById = async (req: Request, res: Response) => {
     // Verifica se o usuário autenticado é o mesmo que está tentando deletar a conta
     //   const userId = req.user?._id.toString();
     // console.log('User ID from request:', req.user?._id.toHexString());
-    console.log('ID from URL params:', id);
+    console.log("ID from URL params:", id);
 
     // if (userId !== id) {
     //   return res.status(403).json({
@@ -41,12 +41,12 @@ export const deleteUserById = async (req: Request, res: Response) => {
 
     return res
       .status(200)
-      .json({ success: true, message: 'Usuário deletado com sucesso' });
+      .json({ success: true, message: "Usuário deletado com sucesso" });
   } catch (error: any) {
-    console.error('Erro ao deletar usuário:', error);
+    console.error("Erro ao deletar usuário:", error);
     return res.status(500).json({
       success: false,
-      message: 'Erro ao deletar usuário',
+      message: "Erro ao deletar usuário",
       error: error.message,
     });
   }
@@ -54,16 +54,14 @@ export const deleteUserById = async (req: Request, res: Response) => {
 
 export const searchUser = async (req: Request, res: Response) => {
   try {
-    
-    const name = (req.query.name as string) || '';
-    const email = (req.query.email as string) || '';
+    const name = (req.query.name as string) || "";
+    const email = (req.query.email as string) || "";
 
-    
     const users = await searchUserService({ name, email });
 
     return res.status(200).json({ users });
   } catch (error) {
-    return res.status(500).json({ error: 'Erro ao buscar usuários' });
+    return res.status(500).json({ error: "Erro ao buscar usuários" });
   }
 };
 
@@ -72,18 +70,18 @@ export const getUser = async (req: Request, res: Response) => {
 
   try {
     const user = await User.findById(id).populate(
-      'friends invites',
-      'name email',
+      "friends invites",
+      "name avatar email"
     );
 
     if (!user) {
-      return res.status(404).json({ message: 'Usuário não encontrado' });
+      return res.status(404).json({ message: "Usuário não encontrado" });
     }
 
     // Aqui, o avatar já estará incluído
     return res.status(200).json(user);
   } catch (error: unknown) {
-    return res.status(500).json({ message: 'Server error', error });
+    return res.status(500).json({ message: "Server error", error });
   }
 };
 
@@ -92,10 +90,10 @@ export const sendInvite = async (req: Request, res: Response) => {
     const userId = req.user?._id as mongoose.Types.ObjectId;
     const friendId = req.params.id;
 
-    console.log('usuario logado', userId, 'usuario para convite', friendId);
+    console.log("usuario logado", userId, "usuario para convite", friendId);
 
     if (!userId) {
-      return res.status(400).json({ message: 'Usuário não autenticado' });
+      return res.status(400).json({ message: "Usuário não autenticado" });
     }
 
     // Converte userId para string antes de passar para o serviço
@@ -103,12 +101,12 @@ export const sendInvite = async (req: Request, res: Response) => {
 
     return res
       .status(200)
-      .json({ message: 'Convite enviado com sucesso', friend });
+      .json({ message: "Convite enviado com sucesso", friend });
   } catch (error: any) {
     console.error(error);
     return res
       .status(500)
-      .json({ message: error.message || 'Erro ao enviar o convite' });
+      .json({ message: error.message || "Erro ao enviar o convite" });
   }
 };
 
@@ -117,19 +115,19 @@ export const allInvites = async (req: Request, res: Response) => {
     const { id } = req.params;
 
     if (!id) {
-      return res.status(400).json({ message: 'Usuário não autenticado' });
+      return res.status(400).json({ message: "Usuário não autenticado" });
     }
 
-    console.log('USUARIO:', id); // Para debugging
+    console.log("USUARIO:", id); // Para debugging
 
     const invites = await allInvitesService(id);
 
     return res.status(200).json({ invites });
   } catch (error: any) {
-    console.error('Error retrieving invites:', error);
+    console.error("Error retrieving invites:", error);
     return res
       .status(500)
-      .json({ message: 'Erro ao recuperar convites', error: error.message });
+      .json({ message: "Erro ao recuperar convites", error: error.message });
   }
 };
 
@@ -139,16 +137,16 @@ export const acceptInvite = async (req: Request, res: Response) => {
     const inviterId = req.params.id;
 
     if (!userId) {
-      return res.status(400).json({ message: 'Usuário não autenticado' });
+      return res.status(400).json({ message: "Usuário não autenticado" });
     }
 
     // Converte userId para string antes de passar para o serviço
     const user = await acceptInviteService(userId.toString(), inviterId);
 
-    return res.status(200).json({ message: 'Convite aceito com sucesso' });
+    return res.status(200).json({ message: "Convite aceito com sucesso" });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ message: 'Erro ao aceitar o convite' });
+    return res.status(500).json({ message: "Erro ao aceitar o convite" });
   }
 };
 
@@ -158,16 +156,16 @@ export const declineInvite = async (req: Request, res: Response) => {
     const inviterId = req.params.id;
 
     if (!userId) {
-      return res.status(400).json({ message: 'Usuário não autenticado' });
+      return res.status(400).json({ message: "Usuário não autenticado" });
     }
 
     // Converte userId para string antes de passar para o serviço
     const user = await declineInviteService(userId.toString(), inviterId);
 
-    return res.status(200).json({ message: 'Convite recusado com sucesso' });
+    return res.status(200).json({ message: "Convite recusado com sucesso" });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ message: 'Erro ao recusar o convite' });
+    return res.status(500).json({ message: "Erro ao recusar o convite" });
   }
 };
 
@@ -177,14 +175,14 @@ export const allFriends = async (req: Request, res: Response) => {
     console.log(userId);
 
     if (!userId) {
-      return res.status(400).json({ message: 'User ID is required' });
+      return res.status(400).json({ message: "User ID is required" });
     }
 
     const friends = await allFriendsService(userId.toString());
     return res.status(200).json({ friends });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ message: 'Erro ao recuperar amigos' });
+    return res.status(500).json({ message: "Erro ao recuperar amigos" });
   }
 };
 
@@ -237,26 +235,26 @@ export const uploadAvatar = async (req: Request, res: Response) => {
     const { avatar } = req.body; // Espera receber a imagem em base64 no campo `avatar`
 
     if (!avatar) {
-      return res.status(400).json({ message: 'Avatar não fornecido.' });
+      return res.status(400).json({ message: "Avatar não fornecido." });
     }
 
     // Faz o upload da imagem em base64 diretamente para o Cloudinary
     const result = await cloudinary.uploader.upload(avatar, {
-      upload_preset: 'social', // Substitua pelo seu upload_preset se configurado no Cloudinary
+      upload_preset: "social", // Substitua pelo seu upload_preset se configurado no Cloudinary
     });
 
-    console.log('RESULTADO:', result.secure_url);
+    console.log("RESULTADO:", result.secure_url);
 
     const user = await User.findByIdAndUpdate(
       req?.user?._id,
       { avatar: result.secure_url },
-      { new: true },
-    ).select('-password');
+      { new: true }
+    ).select("-password");
 
-    console.log('USUARIO COMPLETO LOGADO', req?.user?._id);
+    console.log("USUARIO COMPLETO LOGADO", req?.user?._id);
     res.json(user);
   } catch (err: any) {
     console.error(err);
-    res.status(500).json({ message: 'Erro no servidor' });
+    res.status(500).json({ message: "Erro no servidor" });
   }
 };

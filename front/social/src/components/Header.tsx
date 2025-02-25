@@ -1,21 +1,21 @@
-import { useState, FC } from 'react';
-import { AiOutlineUserDelete } from 'react-icons/ai';
-import { IoLogOutOutline, IoSettingsSharp } from 'react-icons/io5';
-import { useSelector, useDispatch } from 'react-redux';
-import { useDeleteAccountMutation } from '../redux/auth/authApi';
-import { useNavigate } from 'react-router-dom';
-import { userLoggedOut } from '../redux/auth/authSlice';
-import ModalConfirm from './ModalConfirm';
-import { RootState } from '../redux/store';
-import { setUser } from '../redux/user/userSlice';
-import { FaHome, FaUserFriends } from 'react-icons/fa';
-import { FaSearch } from 'react-icons/fa';
-import { useSearchUsersQuery } from '../redux/auth/authApi';
+import { useState, FC } from "react";
+import { AiOutlineUserDelete } from "react-icons/ai";
+import { IoLogOutOutline, IoSettingsSharp } from "react-icons/io5";
+import { useSelector, useDispatch } from "react-redux";
+import { useDeleteAccountMutation } from "../redux/auth/authApi";
+import { useNavigate } from "react-router-dom";
+import { userLoggedOut } from "../redux/auth/authSlice";
+import ModalConfirm from "./ModalConfirm";
+import { RootState } from "../redux/store";
+import { setUser } from "../redux/user/userSlice";
+import { FaHome, FaUserFriends } from "react-icons/fa";
+import { FaSearch } from "react-icons/fa";
+import { useSearchUsersQuery } from "../redux/auth/authApi";
 import {
   useAllInvitesQuery,
   useAcceptInviteMutation,
   useDeclineInviteMutation,
-} from '../redux/user/userApi';
+} from "../redux/user/userApi";
 
 const Header: FC = () => {
   const navigate = useNavigate();
@@ -32,24 +32,24 @@ const Header: FC = () => {
   const id = auth.id;
   const { data = { invites: [] }, refetch } = useAllInvitesQuery({ id });
 
-  const [searchTerm, setSearchTerm] = useState<string>('');
+  const [searchTerm, setSearchTerm] = useState<string>("");
 
   const { data: searchResults } = useSearchUsersQuery(
     { name: searchTerm, email: searchTerm },
-    { skip: !searchTerm },
+    { skip: !searchTerm }
   );
 
   const deleteUser = async () => {
     await deleteAccount(user.id);
-    navigate('/login');
+    navigate("/login");
   };
 
   const logout = () => {
     dispatch(userLoggedOut());
-    navigate('/login');
+    navigate("/login");
   };
 
-  console.log('A LISTA DE CONVITES', data.invites);
+  console.log("A LISTA DE CONVITES", data.invites);
 
   const handleHome = () => {
     dispatch(
@@ -60,7 +60,7 @@ const Header: FC = () => {
         avatar: auth.avatar,
         friends: auth.friends,
         invites: auth.invites,
-      }),
+      })
     );
     navigate(`/${auth.id}`);
   };
@@ -72,7 +72,7 @@ const Header: FC = () => {
       setValue(!value);
       refetch();
     } catch (error) {
-      console.error('Erro ao aceitar o convite:', error);
+      console.error("Erro ao aceitar o convite:", error);
     }
   };
 
@@ -88,7 +88,7 @@ const Header: FC = () => {
       setValue(!value);
       refetch();
     } catch (error) {
-      console.error('Erro ao recusar o convite:', error);
+      console.error("Erro ao recusar o convite:", error);
     }
   };
 
@@ -121,7 +121,7 @@ const Header: FC = () => {
                       onClick={() => handleFriendClick(user)}
                     >
                       <img
-                        src="https://www.designi.com.br/images/preview/12040180.jpg"
+                        src={user.avatar}
                         alt={`${user.name} avatar`}
                         className="w-10 h-10 rounded-full mr-4"
                       />
@@ -203,19 +203,19 @@ const Header: FC = () => {
                   <div className="flex justify-center gap-2">
                     <button
                       className={`p-2 ${
-                        value ? 'bg-orange-600' : 'bg-red-500'
+                        value ? "bg-orange-600" : "bg-red-500"
                       }`}
                       onClick={() => decline(invite._id)}
                     >
-                      {value ? 'Recusou convite' : 'Recusar'}
+                      {value ? "Recusou convite" : "Recusar"}
                     </button>
                     <button
                       className={`p-2 ${
-                        value ? 'bg-green-600' : 'bg-purple-500'
+                        value ? "bg-green-600" : "bg-purple-500"
                       }`}
                       onClick={() => accept(invite._id)}
                     >
-                      {value ? 'Amizade aceita' : 'Aceitar'}
+                      {value ? "Amizade aceita" : "Aceitar"}
                     </button>
                   </div>
                 </article>

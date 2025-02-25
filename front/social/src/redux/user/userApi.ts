@@ -1,5 +1,5 @@
-import { apiSlice } from '../api/apiSlice';
-import { notify } from '../notify/notifySlice';
+import { apiSlice } from "../api/apiSlice";
+import { notify } from "../notify/notifySlice";
 
 // interface Post {
 //   _id: string;
@@ -56,70 +56,70 @@ export const userApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     searchFriends: builder.query<Friend[], SearchParams>({
       query: (params) => ({
-        url: '/user/search',
+        url: "/user/search",
         params,
       }),
     }),
     sendInvite: builder.mutation<Friend, IdFriend>({
       query: ({ id }) => ({
         url: `/user/invite/${id}`,
-        method: 'PUT',
+        method: "PUT",
       }),
       async onQueryStarted(_, { queryFulfilled, dispatch }) {
         try {
           const result = await queryFulfilled;
           // Corrigido para usar a estrutura correta de dispatch
-          console.log('comunicar', result.data.email);
+          console.log("comunicar", result.data.email);
           dispatch(
             notify({
               user: {
                 name: result.data.name,
                 email: result.data.email,
               }, // Ajustar conforme a estrutura do seu resultado
-            }),
+            })
           );
         } catch (error: any) {
-          console.error('Erro ao processar a solicitação:', error);
+          console.error("Erro ao processar a solicitação:", error);
         }
       },
     }),
     allInvites: builder.query<InvitesResponse, any>({
       query: ({ id }) => ({
         url: `/user/invites/${id}`,
-        method: 'GET',
+        method: "GET",
       }),
-      providesTags: ['invites'],
+      providesTags: ["invites"],
 
       async onQueryStarted(_, { queryFulfilled }) {
         try {
           const { data } = await queryFulfilled;
-          console.log('info do api', data);
+          console.log("info do api", data);
           // dispatch(notify(data)); // Despacha os posts obtidos
         } catch (error: any) {
-          console.error('Erro ao processar a solicitação:', error);
+          console.error("Erro ao processar a solicitação:", error);
         }
       },
     }),
     acceptInvite: builder.mutation<void, IdFriend>({
       query: ({ id }) => ({
         url: `/user/accept/${id}`,
-        method: 'PUT',
+        method: "PUT",
       }),
-      invalidatesTags: ['invites'],
+      invalidatesTags: ["invites", "user"],
     }),
     declineInvite: builder.mutation<void, IdFriend>({
       query: ({ id }) => ({
         url: `/user/decline/${id}`,
-        method: 'PUT',
+        method: "PUT",
       }),
-      invalidatesTags: ['invites'],
+      invalidatesTags: ["invites"],
     }),
     getUser: builder.query<any, any>({
       query: ({ id }) => ({
         url: `/user/${id}`,
-        method: 'GET',
+        method: "GET",
       }),
-      providesTags: ['user'],
+      providesTags: ["user"],
     }),
   }),
 });

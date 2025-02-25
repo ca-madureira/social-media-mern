@@ -1,8 +1,8 @@
-import { signToken } from '../middleware/auth';
-import User from '../models/user.model';
-import bcrypt from 'bcryptjs';
-import PasswordResetToken from '../models/passwordReset.model';
-import transport from '../middleware/sendMail';
+import { signToken } from "../middleware/auth";
+import User from "../models/user.model";
+import bcrypt from "bcryptjs";
+import PasswordResetToken from "../models/passwordReset.model";
+import transport from "../middleware/sendMail";
 
 interface CreateUserData {
   name: string;
@@ -33,12 +33,12 @@ export const createUserService = async (data: CreateUserData) => {
   const { name, email, password } = data;
 
   if (!name || !email || !password) {
-    throw new Error('Por favor preencha todos os campos.');
+    throw new Error("Por favor preencha todos os campos.");
   }
 
   const userExists = await User.findOne({ email });
   if (userExists) {
-    throw new Error('Usuário já existe.');
+    throw new Error("Usuário já existe.");
   }
 
   const salt = await bcrypt.genSalt(10);
@@ -55,16 +55,16 @@ export const createUserService = async (data: CreateUserData) => {
   // Populando os campos invites e friends
   const userWithRelations = await User.findById(newUser._id)
     .populate({
-      path: 'invites',
-      select: 'name email',
+      path: "invites",
+      select: "name email",
     })
     .populate({
-      path: 'friends',
-      select: 'name email',
+      path: "friends",
+      select: "name email",
     });
 
   if (!userWithRelations) {
-    throw new Error('Usuário não encontrado após criação.');
+    throw new Error("Usuário não encontrado após criação.");
   }
 
   // Criando o token
@@ -88,18 +88,18 @@ export const loginUserService = async (credentials: LoginUserData) => {
   const { email, password } = credentials;
 
   const user = await User.findOne({ email })
-    .select('+password')
-    .populate('invites')
-    .populate('friends');
+    .select("+password")
+    .populate("invites")
+    .populate("friends");
 
   if (!user) {
-    throw new Error('Usuário não encontrado');
+    throw new Error("Usuário não encontrado");
   }
 
   const isPasswordValid = await bcrypt.compare(password, user.password);
 
   if (!isPasswordValid) {
-    throw new Error('Credenciais inválidas');
+    throw new Error("Credenciais inválidas");
   }
 
   const token = signToken(user);
@@ -121,7 +121,7 @@ export const sendForgotPasswordCodeService = async (email: string) => {
   const user = await User.findOne({ email });
 
   if (!user) {
-    throw new Error('Usuário não existe');
+    throw new Error("Usuário não existe");
   }
 
   const existingToken = await PasswordResetToken.findOne({
@@ -129,7 +129,7 @@ export const sendForgotPasswordCodeService = async (email: string) => {
     expiresAt: { $gt: new Date() }, // Token ainda válido
   });
 
-  const codeValue = Math.floor(Math.random() * 1000000).toString();
+  const codeValue = Math.floor(Math.random() * 100000).toString();
   const expiresAt = new Date(Date.now() + 3600000); // 1 hora de validade
 
   if (existingToken) {
@@ -150,17 +150,17 @@ export const sendForgotPasswordCodeService = async (email: string) => {
   const info = await transport.sendMail({
     from: process.env.NODE_CODE_SENDING_EMAIL_ADDRESS,
     to: user.email,
-    subject: 'Código para recuperação de senha',
+    subject: "Código para recuperação de senha",
     html: `<h1>${codeValue}</h1>`,
   });
 
   if (info.accepted.length === 0) {
-    throw new Error('Erro ao enviar o código de recuperação de senha');
+    throw new Error("Erro ao enviar o código de recuperação de senha");
   }
 
   return {
     success: true,
-    message: 'Código de recuperação enviado com sucesso!',
+    message: "Código de recuperação enviado com sucesso!",
   };
 };
 
@@ -169,7 +169,7 @@ export const verifyCodeService = async (data: verifyCodeData) => {
   const user = await User.findOne({ email });
 
   if (!user) {
-    throw new Error('Usuario nao existe.');
+    throw new Error("Usuario nao existe.");
   }
 
   const tokenRecord = await PasswordResetToken.findOne({
@@ -178,21 +178,21 @@ export const verifyCodeService = async (data: verifyCodeData) => {
   });
 
   if (!tokenRecord) {
-    throw new Error('codigo expirado ou inexistente');
+    throw new Error("codigo expirado ou inexistente");
   }
 
   if (tokenRecord.expiresAt < new Date()) {
-    throw new Error('Token expirado');
+    throw new Error("Token expirado");
   }
 };
 
 export const updateUserPasswordService = async (
   email: string,
-  pass: string,
+  pass: string
 ) => {
   const user = await User.findOne({ email });
   if (!user) {
-    throw new Error('Usuário não encontrado');
+    throw new Error("Usuário não encontrado");
   }
 
   const saltRounds = 10;
@@ -201,5 +201,5 @@ export const updateUserPasswordService = async (
   user.password = hashedPassword;
   await user.save();
 
-  return { success: true, message: 'Senha atualizada com sucesso!' };
+  return { success: true, message: "Senha atualizada com sucesso!" };
 };
