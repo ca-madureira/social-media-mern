@@ -1,16 +1,12 @@
-import React, { useState } from 'react';
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
-import { IoCloseSharp } from 'react-icons/io5';
-import { useCreatePostMutation } from '../redux/post/postApi';
-
-interface ModalProps {
-  openModal: boolean;
-  setOpenModal: (open: boolean) => void;
-}
+import React, { useState } from "react";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
+import { IoCloseSharp } from "react-icons/io5";
+import { useCreatePostMutation } from "../redux/post/postApi";
+import { ModalProps } from "../interfaces";
 
 const ModalPost: React.FC<ModalProps> = ({ openModal, setOpenModal }) => {
-  const [content, setContent] = useState('');
+  const [content, setContent] = useState("");
   const [charCount, setCharCount] = useState(0);
   const [createPost, { isLoading, error }] = useCreatePostMutation();
 
@@ -29,8 +25,8 @@ const ModalPost: React.FC<ModalProps> = ({ openModal, setOpenModal }) => {
   const modules = {
     toolbar: [
       [{ header: [1, 2, 3, false] }],
-      ['bold', 'italic', 'underline'],
-      [{ indent: '-1' }, { indent: '+1' }],
+      ["bold", "italic", "underline"],
+      [{ indent: "-1" }, { indent: "+1" }],
       [{ align: [] }],
       [{ color: [] }],
     ],
@@ -40,10 +36,10 @@ const ModalPost: React.FC<ModalProps> = ({ openModal, setOpenModal }) => {
     try {
       await createPost({ content }).unwrap();
       setOpenModal(false);
-      setContent('');
+      setContent("");
       setCharCount(0);
     } catch (err) {
-      console.error('Erro ao criar post:', err);
+      console.error("Erro ao criar post:", err);
     }
   };
 
@@ -79,7 +75,7 @@ const ModalPost: React.FC<ModalProps> = ({ openModal, setOpenModal }) => {
             onClick={handleSubmit}
             disabled={isLoading || content.length === 0}
           >
-            {isLoading ? 'Publicando...' : 'Publicar'}
+            {isLoading ? "Publicando..." : "Publicar"}
           </button>
         </footer>
         {error && (

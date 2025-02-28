@@ -1,27 +1,22 @@
-import { useState } from 'react';
-import { useParams } from 'react-router-dom'; // Importe useParams
+import { useState } from "react";
+import { useParams } from "react-router-dom";
 import {
   useGetUserPostsQuery,
   useDeletePostByIdMutation,
   useEditPostMutation,
   useVotePostMutation,
-} from '../redux/post/postApi';
-import { FaRegHeart, FaEdit, FaHeart } from 'react-icons/fa';
-import { MdDelete } from 'react-icons/md';
-import { RootState } from '../redux/store';
-import calculateTimeAgo from '../utils/calculaTimeAgo';
-import ReactQuill from 'react-quill';
-import { useSelector } from 'react-redux';
+} from "../redux/post/postApi";
+import { FaRegHeart, FaEdit, FaHeart } from "react-icons/fa";
+import { MdDelete } from "react-icons/md";
+import { RootState } from "../redux/store";
+import calculateTimeAgo from "../utils/calculaTimeAgo";
+import ReactQuill from "react-quill";
+import { useSelector } from "react-redux";
+import { PostData } from "../interfaces";
 
-// interface UserData {
-//   id: string;
-//   name: string;
-//   email: string;
-// }
-
-const Post: React.FC<any> = ({ user }: any) => {
+const Post = () => {
   const { id } = useParams<{ id: string }>();
-  console.log('ID NA URL', id);
+  console.log("ID NA URL", id);
   const { data, isLoading, isError } = useGetUserPostsQuery({ id });
 
   const auth = useSelector((state: RootState) => state.auth?.id);
@@ -31,9 +26,7 @@ const Post: React.FC<any> = ({ user }: any) => {
   const [votePost] = useVotePostMutation();
 
   const [modeEdit, setModeEdit] = useState<string | null>(null);
-  const [content, setContent] = useState<string>('');
-  // const [voteState, setVoteState] = useState<{ [key: string]: boolean }>({});
-  // const [reaction, setReaction] = useState<{ [key: string]: string }>({});
+  const [content, setContent] = useState<string>("");
   const [toggle, setToggle] = useState(false);
 
   if (isLoading) {
@@ -65,15 +58,12 @@ const Post: React.FC<any> = ({ user }: any) => {
 
   const handleVote = async (postId: string) => {
     await votePost({ id: postId });
-    // setVoteState((prevVoteState) => ({
-    //   ...prevVoteState,
-    //   [postId]: !prevVoteState[postId],
-    // }));
   };
+  console.log(data);
 
   return (
     <section className="w-full md:space-y-4">
-      {data?.posts.map((post: any, index: any) => (
+      {data?.posts.map((post: PostData, index: number) => (
         <article
           key={index}
           className="bg-white shadow-purple-600 shadow-md rounded-md p-1"
@@ -91,7 +81,7 @@ const Post: React.FC<any> = ({ user }: any) => {
           <section className="flex gap-2 border-b-2 border-purple-200 p-1">
             <img
               className="w-10 h-10 border-4 border-purple-200 rounded-md"
-              src={user.avatar}
+              src={post.author.avatar}
               alt="User Avatar"
             />
             <div className="text-sm">
@@ -134,7 +124,7 @@ const Post: React.FC<any> = ({ user }: any) => {
                 )}
               </button>
               {`${post.votes.length} ${
-                post.votes.length === 1 ? 'voto' : 'votos'
+                post.votes.length === 1 ? "voto" : "votos"
               }`}
             </footer>
           </section>

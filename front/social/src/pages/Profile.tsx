@@ -14,9 +14,16 @@ import { useGetUserQuery } from "../redux/user/userApi";
 const Profile = () => {
   const [openModal, setOpenModal] = useState(false);
   const [openChat, setOpenChat] = useState(false);
+
   const auth = useSelector((state: RootState) => state.auth);
   const { id } = useParams();
 
+  // Acessando o estado do Redux corretamente com o tipo RootState
+  const isChat = useSelector((state: RootState) => state.chat?.chatActive);
+  const nameChat = useSelector((state: RootState) => state.chat?.name);
+  const avatarChat = useSelector((state: RootState) => state.chat?.avatar);
+
+  // Obtendo dados do usuário com a query personalizada
   const { data: friend } = useGetUserQuery({ id }, { skip: !id });
 
   const isLoggedIn = !id || auth?.id === id;
@@ -36,63 +43,40 @@ const Profile = () => {
 
             <Post user={userData} />
           </section>
+
           <section className="w-[35%] flex flex-col gap-4">
             <Friends user={userData} />
             <section className="p-4 bg-white shadow-md shadow-purple-600 flex flex-col gap-2 h-[70%] overflow-y-auto">
               <h4 className="text-lg font-bold mb-2 text-purple-700">
                 Conversas
               </h4>
-              <section
-                onClick={() => setOpenChat(!openChat)}
-                className="flex bg-white border w-full border-red-700 self-end items-center gap-2 border border-purple-300 rounded-md px-2 relative cursor-pointer"
-              >
-                <img
-                  className="w-8 h-8 border border-2 rounded-full border-purple-400"
-                  src="https://static.vecteezy.com/system/resources/thumbnails/048/216/761/small/modern-male-avatar-with-black-hair-and-hoodie-illustration-free-png.png"
-                />
-                <div className="flex flex-col ">
-                  <p className="font-semibold">João</p>
-                  <p className="text-sm">Estou doente</p>
-                  <div className="absolute bg-purple-700 w-6 h-6 rounded-full right-0 text-white font-bold text-sm/6 text-center">
-                    12
+
+              {/* Mapeando para seções de conversa */}
+              {[1, 2, 3, 4].map((_, index) => (
+                <section
+                  key={index}
+                  onClick={() => setOpenChat(!openChat)}
+                  className="flex bg-white border w-full border-red-700 self-end items-center gap-2 border border-purple-300 rounded-md px-2 relative cursor-pointer"
+                >
+                  <img
+                    className="w-8 h-8 border border-2 rounded-full border-purple-400"
+                    src="https://static.vecteezy.com/system/resources/thumbnails/048/216/761/small/modern-male-avatar-with-black-hair-and-hoodie-illustration-free-png.png"
+                  />
+                  <div className="flex flex-col ">
+                    <p className="font-semibold">João</p>
+                    <p className="text-sm">Estou doente</p>
+                    <div className="absolute bg-purple-700 w-6 h-6 rounded-full right-0 text-white font-bold text-sm/6 text-center">
+                      12
+                    </div>
                   </div>
-                </div>
-              </section>
-              <section className="flex bg-white border w-full border-red-700 self-end items-center gap-2 border border-purple-300 rounded-md px-2">
-                <img
-                  className="w-8 h-8 border border-2 rounded-full border-purple-400"
-                  src="https://static.vecteezy.com/system/resources/thumbnails/048/216/761/small/modern-male-avatar-with-black-hair-and-hoodie-illustration-free-png.png"
-                />
-                <div className="flex flex-col">
-                  <p className="font-semibold">João</p>
-                  <p className="text-sm">Estou doente</p>
-                </div>
-              </section>
-              <section className="flex bg-white border w-full border-red-700 self-end items-center gap-2 border border-purple-300 rounded-md px-2">
-                <img
-                  className="w-8 h-8 border border-2 rounded-full border-purple-400"
-                  src="https://static.vecteezy.com/system/resources/thumbnails/048/216/761/small/modern-male-avatar-with-black-hair-and-hoodie-illustration-free-png.png"
-                />
-                <div className="flex flex-col">
-                  <p className="font-semibold">João</p>
-                  <p className="text-sm">Estou doente</p>
-                </div>
-              </section>
-              <section className="flex bg-white border w-full border-red-700 self-end items-center gap-2 border border-purple-300 rounded-md px-2">
-                <img
-                  className="w-8 h-8 border border-2 rounded-full border-purple-400"
-                  src="https://static.vecteezy.com/system/resources/thumbnails/048/216/761/small/modern-male-avatar-with-black-hair-and-hoodie-illustration-free-png.png"
-                />
-                <div className="flex flex-col">
-                  <p className="font-semibold">João</p>
-                  <p className="text-sm">Estou doente</p>
-                </div>
-              </section>
+                </section>
+              ))}
             </section>
           </section>
         </section>
 
-        {openChat && <Chat />}
+        {/* Renderizando o componente Chat se o estado de chat estiver ativo */}
+        {isChat && <Chat name={nameChat} avatar={avatarChat} />}
       </main>
 
       {openModal && isLoggedIn && (

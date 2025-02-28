@@ -6,7 +6,7 @@ import userRouter from "./routes/user.route";
 import postRoute from "./routes/postRoute";
 import messageRoute from "./routes/message.route";
 import authRouter from "./routes/auth.route";
-// import { app } from "./socket";
+
 import conversationRoute from "./routes/conversation.route";
 
 export const app = express();
@@ -19,7 +19,7 @@ app.use(cookieParser());
 app.use(
   cors({
     origin: ["http://localhost:5174", "http://localhost:5173"],
-    methods: ["POST", "GET", "PUT", "OPTIONS"],
+    methods: ["POST", "GET", "PUT"],
     credentials: true,
   })
 );

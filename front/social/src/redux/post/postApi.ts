@@ -1,79 +1,62 @@
-import { apiSlice } from '../api/apiSlice';
-import { getUserPosts } from './postSlice';
+import { apiSlice } from "../api/apiSlice";
+import { getUserPosts } from "./postSlice";
 
-export interface PostData {
-  content: string;
-}
-
-export interface PostState {
-  posts: PostData[];
-}
-
-export interface AuthorData {
-  author: string;
-}
-
-export interface IdPost {
-  id: string;
-}
+import { IdPost, PostState, PostData, IdUser } from "../../interfaces";
 
 const postApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     createPost: builder.mutation<void, PostData>({
       query: (postData) => ({
-        url: '/posts/create',
-        method: 'POST',
+        url: "/posts/create",
+        method: "POST",
         body: postData,
       }),
-      invalidatesTags: ['posts'],
+      invalidatesTags: ["posts"],
     }),
-    getUserPosts: builder.query<any, any>({
+    getUserPosts: builder.query<PostState, IdUser>({
       query: ({ id }) => ({
         url: `/posts/${id}`,
-        method: 'GET',
+        method: "GET",
       }),
-      providesTags: ['posts'],
+      providesTags: ["posts"],
       async onQueryStarted(_, { queryFulfilled, dispatch }) {
         try {
           const { data } = await queryFulfilled;
-          console.log('INFORMACOES DE RETORNO DO POST:', data);
+          console.log("INFORMACOES DE RETORNO DO POST:", data);
           dispatch(getUserPosts(data));
-        } catch (error: any) {
-          console.error('Erro ao processar a solicitação:', error);
+        } catch (error: unknown) {
+          // Verificando se o erro é uma instância de Error antes de acessar suas propriedades
+          if (error instanceof Error) {
+            console.error("Erro ao processar a solicitação:", error.message);
+          } else {
+            console.error("Erro desconhecido:", error);
+          }
         }
       },
     }),
-    deletePostById: builder.mutation<void, string>({
+    deletePostById: builder.mutation<void, IdPost>({
       query: (idPost) => ({
         url: `/posts/delete/${idPost}`,
-        method: 'DELETE',
-        credentials: 'include' as const,
+        method: "DELETE",
+        credentials: "include" as const,
       }),
     }),
     editPost: builder.mutation<void, { id: string; content: string }>({
       query: ({ id, content }) => ({
         url: `/posts/update/${id}`,
-        method: 'PUT',
+        method: "PUT",
         body: { content },
-        credentials: 'include' as const,
+        credentials: "include" as const,
       }),
     }),
-    votePost: builder.mutation<any, { id: string }>({
+    votePost: builder.mutation<void, { id: string }>({
       query: ({ id }) => ({
         url: `/posts/vote/${id}`,
-        method: 'PUT',
-        credentials: 'include' as const,
+        method: "PUT",
+        credentials: "include" as const,
       }),
-      async onQueryStarted(_, { queryFulfilled }) {
-        try {
-          const result = await queryFulfilled;
 
-          console.log('quantidade de votos', result.data.votes);
-        } catch (error: any) {
-          console.log(error);
-        }
-      },
-      invalidatesTags: ['posts'],
+      invalidatesTags: ["posts"],
     }),
   }),
 });

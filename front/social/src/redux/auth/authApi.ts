@@ -1,53 +1,29 @@
-import { apiSlice } from '../api/apiSlice';
-import { userAuthentication } from './authSlice';
-import { setUser } from '../user/userSlice';
+import { apiSlice } from "../api/apiSlice";
+import { userAuthentication } from "./authSlice";
+import { setUser } from "../user/userSlice";
 
-type User = {
-  name: string;
-  email: string;
-  id: string;
-  friends: object[];
-  invites: object[];
-  avatar: string;
-};
-
-type AuthResponse = {
-  token: string;
-  user: User;
-};
-
-type AuthData = {
-  email: string;
-  password: string;
-};
-
-type AuthRegister = {
-  name: string;
-  email: string;
-  password: string;
-};
-
-type SearchResponse = {
-  users: User[];
-};
+import {
+  AuthResponse,
+  AuthRegister,
+  AuthLogin,
+  SearchResponse,
+  IdUser,
+} from "../../interfaces";
 
 export const authApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     registerUser: builder.mutation<AuthResponse, AuthRegister>({
       query: (data) => ({
-        url: '/auth/create',
-        method: 'POST',
+        url: "/auth/create",
+        method: "POST",
         body: data,
       }),
       async onQueryStarted(_, { queryFulfilled, dispatch }) {
         try {
           const result = await queryFulfilled;
 
-          console.log('CONTEUDO PARA NAO PERDER: ', result);
-          // console.log('Resultado: ', result);
-          // console.log('valores de CADASTRO', result.data.token);
-          // console.log('usuario criado: ', result.data.user);
-          // console.log('token de usuario logado', result.data.token);
+          console.log("CONTEUDO PARA NAO PERDER: ", result);
+
           dispatch(
             userAuthentication({
               id: result.data.user.id,
@@ -57,7 +33,7 @@ export const authApi = apiSlice.injectEndpoints({
               friends: result.data.user.friends,
               invites: result.data.user.invites,
               token: result.data.token,
-            }),
+            })
           );
           dispatch(
             setUser({
@@ -67,24 +43,30 @@ export const authApi = apiSlice.injectEndpoints({
               avatar: result.data.user.avatar,
               friends: result.data.user.friends,
               invites: result.data.user.invites,
-            }),
+            })
           );
-        } catch (error: any) {
-          console.error('Erro ao processar a solicitação:', error);
+        } catch (error: unknown) {
+          // Usando 'unknown'
+          if (error instanceof Error) {
+            // Verificando se é uma instância de Error
+            console.error("Erro ao processar a solicitação:", error.message);
+          } else {
+            console.error("Erro desconhecido:", error);
+          }
         }
       },
     }),
-    login: builder.mutation<AuthResponse, AuthData>({
+    login: builder.mutation<AuthResponse, AuthLogin>({
       query: ({ email, password }) => ({
-        url: '/auth/login',
-        method: 'POST',
+        url: "/auth/login",
+        method: "POST",
         body: { email, password },
       }),
       async onQueryStarted(_, { queryFulfilled, dispatch }) {
         try {
           const result = await queryFulfilled;
 
-          console.log('CONTEUDO PARA NAO PERDER: ', result.data.user.id);
+          console.log("CONTEUDO PARA NAO PERDER: ", result.data.user.id);
 
           dispatch(
             userAuthentication({
@@ -95,7 +77,7 @@ export const authApi = apiSlice.injectEndpoints({
               friends: result.data.user.friends,
               invites: result.data.user.invites,
               token: result.data.token,
-            }),
+            })
           );
           dispatch(
             setUser({
@@ -105,18 +87,24 @@ export const authApi = apiSlice.injectEndpoints({
               avatar: result.data.user.avatar,
               friends: result.data.user.friends,
               invites: result.data.user.invites,
-            }),
+            })
           );
-        } catch (error: any) {
-          console.log(error);
+        } catch (error: unknown) {
+          // Usando 'unknown'
+          if (error instanceof Error) {
+            // Verificando se é uma instância de Error
+            console.error("Erro ao processar a solicitação:", error.message);
+          } else {
+            console.error("Erro desconhecido:", error);
+          }
         }
       },
     }),
-    deleteAccount: builder.mutation<void, string>({
+    deleteAccount: builder.mutation<void, IdUser>({
       query: (idUser) => ({
         url: `/user/delete/${idUser}`,
-        method: 'DELETE',
-        credentials: 'include' as const,
+        method: "DELETE",
+        credentials: "include" as const,
       }),
     }),
     searchUsers: builder.query<
@@ -128,31 +116,31 @@ export const authApi = apiSlice.injectEndpoints({
         if (name) params.name = name;
         if (email) params.email = email;
         return {
-          url: '/user/search',
-          method: 'GET',
+          url: "/user/search",
+          method: "GET",
           params,
-          credentials: 'include' as const,
+          credentials: "include" as const,
         };
       },
     }),
-    sendForgotPasswordCode: builder.mutation<void, any>({
+    sendForgotPasswordCode: builder.mutation<void, string>({
       query: (data) => ({
-        url: '/auth/forgotPass',
-        method: 'POST',
+        url: "/auth/forgotPass",
+        method: "POST",
         body: data,
       }),
     }),
-    verifyCode: builder.mutation<void, any>({
+    verifyCode: builder.mutation<void, string>({
       query: (data) => ({
-        url: '/auth/verifyCode',
-        method: 'POST',
+        url: "/auth/verifyCode",
+        method: "POST",
         body: data,
       }),
     }),
-    updatePass: builder.mutation<void, any>({
+    updatePass: builder.mutation<void, string>({
       query: (data) => ({
-        url: '/auth/updatePass',
-        method: 'PUT',
+        url: "/auth/updatePass",
+        method: "PUT",
         body: data,
       }),
     }),

@@ -5,20 +5,7 @@ import { RootState } from "../redux/store";
 import { RiEmotionHappyFill } from "react-icons/ri";
 import { AiOutlineEdit } from "react-icons/ai";
 import { useUpdateAvatarMutation } from "../redux/profile/profileApi";
-
-interface UserData {
-  _id: string;
-  name: string;
-  email: string;
-  avatar: string;
-  invites: object[];
-  friends: object[];
-}
-
-interface ProfileCardProps {
-  user: UserData;
-  isLoggedIn: boolean;
-}
+import { UserProfile, ProfileCardProps } from "../interfaces";
 
 const ProfileCard: React.FC<ProfileCardProps> = ({ user, isLoggedIn }) => {
   const [sendInvite, { isLoading, error }] = useSendInviteMutation();
@@ -27,10 +14,10 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ user, isLoggedIn }) => {
   const [updateAvatar] = useUpdateAvatarMutation();
 
   const isInvite = user?.invites?.some(
-    (invite: any) => invite.email === auth?.email
+    (invite: UserProfile) => invite.email === auth?.email
   );
   const isFriend = user?.friends?.some(
-    (friend: any) => friend.email === auth?.email
+    (friend: UserProfile) => friend.email === auth?.email
   );
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {

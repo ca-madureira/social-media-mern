@@ -1,66 +1,22 @@
 import { apiSlice } from "../api/apiSlice";
 import { notify } from "../notify/notifySlice";
-
-// interface Post {
-//   _id: string;
-//   content: string;
-//   likes: string[];
-//   author: {
-//     _id: string;
-//     name: string;
-//     avatar?: string;
-//   };
-//   createdAt: string;
-// }
-
-interface Friend {
-  id: string;
-  name: string;
-  email: string;
-}
-
-interface SearchParams {
-  name?: string;
-  email?: string;
-}
-
-export interface AuthorData {
-  _id: string;
-}
-
-interface IdFriend {
-  id: string;
-}
-
-interface FriendInvite {
-  name?: string;
-  email?: string;
-  _id?: string;
-}
-
-// interface FriendOficial {
-//   _id?: string;
-//   name?: string;
-//   email?: string;
-// }
-
-interface InvitesResponse {
-  invites: FriendInvite[];
-}
-
-// interface FriendsResponse {
-//   friends: FriendOficial[];
-// }
+import { UserData } from "./userSlice";
+import {
+  IdInvite,
+  SearchParams,
+  InvitesResponse,
+  User,
+} from "../../interfaces";
 
 export const userApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    searchFriends: builder.query<Friend[], SearchParams>({
+    searchFriends: builder.query<User[], SearchParams>({
       query: (params) => ({
         url: "/user/search",
         params,
       }),
     }),
-    sendInvite: builder.mutation<Friend, IdFriend>({
+    sendInvite: builder.mutation<User, IdInvite>({
       query: ({ id }) => ({
         url: `/user/invite/${id}`,
         method: "PUT",
@@ -78,12 +34,17 @@ export const userApi = apiSlice.injectEndpoints({
               }, // Ajustar conforme a estrutura do seu resultado
             })
           );
-        } catch (error: any) {
-          console.error("Erro ao processar a solicitação:", error);
+        } catch (error: unknown) {
+          // Verificando se o erro é uma instância de Error antes de acessar suas propriedades
+          if (error instanceof Error) {
+            console.error("Erro ao processar a solicitação:", error.message);
+          } else {
+            console.error("Erro desconhecido:", error);
+          }
         }
       },
     }),
-    allInvites: builder.query<InvitesResponse, any>({
+    allInvites: builder.query<InvitesResponse, IdInvite>({
       query: ({ id }) => ({
         url: `/user/invites/${id}`,
         method: "GET",
@@ -95,26 +56,31 @@ export const userApi = apiSlice.injectEndpoints({
           const { data } = await queryFulfilled;
           console.log("info do api", data);
           // dispatch(notify(data)); // Despacha os posts obtidos
-        } catch (error: any) {
-          console.error("Erro ao processar a solicitação:", error);
+        } catch (error: unknown) {
+          // Verificando se o erro é uma instância de Error antes de acessar suas propriedades
+          if (error instanceof Error) {
+            console.error("Erro ao processar a solicitação:", error.message);
+          } else {
+            console.error("Erro desconhecido:", error);
+          }
         }
       },
     }),
-    acceptInvite: builder.mutation<void, IdFriend>({
+    acceptInvite: builder.mutation<void, IdInvite>({
       query: ({ id }) => ({
         url: `/user/accept/${id}`,
         method: "PUT",
       }),
       invalidatesTags: ["invites", "user"],
     }),
-    declineInvite: builder.mutation<void, IdFriend>({
+    declineInvite: builder.mutation<void, IdInvite>({
       query: ({ id }) => ({
         url: `/user/decline/${id}`,
         method: "PUT",
       }),
       invalidatesTags: ["invites"],
     }),
-    getUser: builder.query<any, any>({
+    getUser: builder.query<UserData, IdInvite>({
       query: ({ id }) => ({
         url: `/user/${id}`,
         method: "GET",

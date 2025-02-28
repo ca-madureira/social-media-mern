@@ -1,0 +1,20 @@
+{
+  "name": "socket",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "ts-node-dev --respawn --transpile-only socket.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "socket.io": "^4.8.1",
+    "ts-node-dev": "^2.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.3"
+  }
+}

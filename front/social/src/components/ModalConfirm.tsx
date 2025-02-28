@@ -1,9 +1,5 @@
-import React from 'react';
-
-interface ModalConfirmProps {
-  deleteUser: () => void;
-  setOpenModalConfirm: (value: boolean) => void;
-}
+import React from "react";
+import { ModalConfirmProps } from "../interfaces";
 
 const ModalConfirm: React.FC<ModalConfirmProps> = ({
   deleteUser,

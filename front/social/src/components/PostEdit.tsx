@@ -1,12 +1,13 @@
 import { useState } from "react";
+import { UserProfile } from "../interfaces";
 
 interface UserData {
   _id: string;
   name: string;
   email: string;
   avatar: string;
-  invites: object[];
-  friends: object[];
+  invites: UserProfile[];
+  friends: UserProfile[];
 }
 
 interface PostEditProps {

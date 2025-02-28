@@ -1,5 +1,5 @@
-import { isAuthenticatedToken, signToken } from '../middleware/token';
-import express from 'express';
+import { isAuthenticatedToken, signToken } from "../middleware/token";
+import express from "express";
 import {
   createPost,
   getUserPosts,
@@ -8,20 +8,20 @@ import {
   votePost,
   reactToPost,
   userVotedPost,
-} from '../controllers/post.controller';
+} from "../controllers/post.controller";
 
 const postRoute = express.Router();
 
-postRoute.post('/create', isAuthenticatedToken, createPost);
+postRoute.post("/create", isAuthenticatedToken, createPost);
 
-postRoute.get('/:id', isAuthenticatedToken, getUserPosts);
+postRoute.get("/:id", isAuthenticatedToken, getUserPosts);
 
-postRoute.delete('/delete/:id', isAuthenticatedToken, deletePostById);
+postRoute.delete("/delete/:id", isAuthenticatedToken, deletePostById);
 
-postRoute.put('/update/:id', isAuthenticatedToken, updatePostById);
+postRoute.put("/update/:id", isAuthenticatedToken, updatePostById);
 
-postRoute.put('/reaction/:id', isAuthenticatedToken, reactToPost);
+postRoute.put("/reaction/:id", isAuthenticatedToken, reactToPost);
 
-postRoute.put('/vote/:id', isAuthenticatedToken, votePost);
+postRoute.put("/vote/:id", isAuthenticatedToken, votePost);
 
 export default postRoute;
