@@ -1,15 +1,15 @@
-import { useState, useRef, ChangeEvent } from "react";
-import { useForm } from "react-hook-form";
+import { useState, useRef, ChangeEvent, KeyboardEvent } from "react";
+import { useForm, SubmitHandler } from "react-hook-form";
 import {
   useSendForgotPasswordCodeMutation,
   useUpdatePassMutation,
   useVerifyCodeMutation,
 } from "../redux/auth/authApi";
 import { useNavigate } from "react-router-dom";
+import { FormForgotPass } from "../interfaces";
 
 const ForgotPass = () => {
   const [otp, setOtp] = useState(["", "", "", "", ""]);
-
   const [step, setStep] = useState(1);
   const navigate = useNavigate();
   const [verifyCode] = useVerifyCodeMutation();
@@ -22,7 +22,7 @@ const ForgotPass = () => {
     handleSubmit,
     formState: { errors },
     getValues,
-  } = useForm({
+  } = useForm<FormForgotPass>({
     defaultValues: {
       email: "",
       code: "",
@@ -32,31 +32,30 @@ const ForgotPass = () => {
     mode: "onChange",
   });
 
-  const otpRefs = useRef([]);
+  const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
 
-  const handleSendEmail = async (data: string) => {
-    await sendForgotPasswordCode({ email: data.email }).unwrap();
+  const handleSendEmail = async (data: { email: string }) => {
+    await sendForgotPasswordCode(data.email).unwrap();
     setStep(2);
   };
 
-  const handleSendCode = async (otpCode) => {
+  const handleSendCode = async (otpCode: string) => {
     const email = getValues("email");
     await verifyCode({ email, code: otpCode }).unwrap();
     setStep(3);
   };
 
-  const handleSavePass = async (data) => {
+  const handleSavePass: SubmitHandler<FormForgotPass> = async (data) => {
     const email = getValues("email");
     await updatePass({ email, pass: data.password }).unwrap();
     navigate("/login");
   };
 
-  const handleSend = (data) => {
+  const handleSend: SubmitHandler<FormForgotPass> = (data) => {
     if (step === 1) {
       handleSendEmail(data);
     } else if (step === 2) {
-      // Aqui estamos enviando o código OTP como uma string
-      handleSendCode(otp.join("")); // Combina os valores do OTP e envia como string
+      handleSendCode(otp.join(""));
     } else if (step === 3) {
       handleSavePass(data);
     }
@@ -64,21 +63,21 @@ const ForgotPass = () => {
 
   const handleOtpChange = (e: ChangeEvent<HTMLInputElement>, index: number) => {
     const value = e.target.value;
-    if (/[^0-9]/.test(value)) return; // Prevent invalid input (only numbers)
+    if (/[^0-9]/.test(value)) return;
 
     const newOtp = [...otp];
     newOtp[index] = value;
     setOtp(newOtp);
 
     if (value && index < otp.length - 1) {
-      otpRefs.current[index + 1].focus(); // Move to next input field
+      otpRefs.current[index + 1]?.focus();
     }
   };
 
   const handleKeyDown = (e: KeyboardEvent, index: number) => {
     if (e.key === "Backspace" && !otp[index]) {
       if (index > 0) {
-        otpRefs.current[index - 1].focus(); // Move to previous input field
+        otpRefs.current[index - 1]?.focus();
       }
     }
   };

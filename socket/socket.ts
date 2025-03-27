@@ -1,59 +1,42 @@
 import { Server } from "socket.io";
 
-// Define the User interface
 interface User {
   userId: string;
   socketId: string;
 }
 
-// Initialize the server with the correct CORS configuration
 const io = new Server({
   cors: {
-    origin: "http://localhost:5173", // Allow requests from this origin
-    methods: ["GET", "POST"], // Allowed HTTP methods
+    origin: ["http://localhost:5173", "http://localhost:5174"],
+    methods: ["GET", "POST"],
   },
 });
 
-// Explicitly type the onlineUsers array
-let onlineUsers: User[] = [];
+let activeUsers: User[] = [];
 
 io.on("connection", (socket) => {
-  console.log("nova conexao", socket.id);
+  console.log("Novo usuário conectado:", socket.id);
 
-  socket.on("addNewUser", (userId: string) => {
-    console.log(onlineUsers);
-    if (!onlineUsers.some((user) => user.userId === userId)) {
-      onlineUsers.push({
-        userId,
-        socketId: socket.id,
-      });
+  socket.on("new-user-add", (newUserId: string) => {
+    if (!activeUsers.some((user) => user.userId === newUserId)) {
+      activeUsers.push({ userId: newUserId, socketId: socket.id });
+      io.emit("get-users", activeUsers);
+      console.log("lista de usuarios online", activeUsers);
     }
-    io.emit("getOnlineUsers", onlineUsers);
   });
 
-  socket.on(
-    "sendMessage",
-    (message: { senderId: string; recipientId: string; content: string }) => {
-      const user = onlineUsers.find(
-        (user) => user.userId === message.recipientId
-      );
+  socket.on("user-disconnect", () => {
+    activeUsers = activeUsers.filter((user) => user.socketId !== socket.id);
+    io.emit("get-users", activeUsers);
 
-      if (user) {
-        io.to(user.socketId).emit("getMessage", message);
-        io.to(user.socketId).emit("getNotification", {
-          senderId: message.senderId,
-          isRead: false,
-          date: new Date(),
-        });
-        console.log("mensagem enviada");
-      }
+    console.log("Usuários ativos após desconexão:", activeUsers);
+  });
+
+  socket.on("send-message", ({ senderId, receiverId, message }) => {
+    const receiver = activeUsers.find((user) => user.userId === receiverId);
+    if (receiver) {
+      io.to(receiver.socketId).emit("receive-message", { senderId, message });
     }
-  );
-
-  socket.on("disconnect", () => {
-    onlineUsers = onlineUsers.filter((user) => user.socketId !== socket.id);
-
-    io.emit("getOnlineUsers", onlineUsers);
   });
 });
 
