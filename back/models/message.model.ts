@@ -1,10 +1,10 @@
 import mongoose, { Schema, Model, Document } from "mongoose";
-import User from "./user.model";
 
 export interface IMessage extends Document {
   senderId: Object;
   receiverId: Object;
   message: string;
+  read: boolean;
 }
 
 const messageSchema: Schema<IMessage> = new mongoose.Schema(
@@ -22,6 +22,10 @@ const messageSchema: Schema<IMessage> = new mongoose.Schema(
     message: {
       type: String,
       required: true,
+    },
+    read: {
+      type: Boolean,
+      default: false,
     },
   },
   {

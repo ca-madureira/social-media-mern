@@ -1,29 +1,22 @@
-import { NextFunction, Request, Response } from "express";
-import { signToken } from "../middleware/token";
-import bcrypt from "bcryptjs";
-
-import mongoose, { mongo } from "mongoose";
-import createToken from "../middleware/createToken";
-import PasswordResetToken from "../models/passwordReset.model";
+import { Request, Response } from "express";
+import mongoose from "mongoose";
 import cloudinary from "../utils/cloudinary";
 
 import { deleteUserByIdService } from "../services/user.service";
-import User, { IUser } from "../models/user.model";
+import User from "../models/user.model";
 import {
   searchUserService,
   sendInviteService,
   allInvitesService,
   acceptInviteService,
   allFriendsService,
-  getFriendPostsService,
   declineInviteService,
+  unfriendService,
 } from "../services/user.service";
-import Post from "../models/post.model";
-import transport from "../middleware/sendMail";
 
 export const deleteUserById = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params; // Obtém o 'id' da URL
+    const { id } = req.params;
 
     // Verifica se o usuário autenticado é o mesmo que está tentando deletar a conta
     //   const userId = req.user?._id.toString();
@@ -78,7 +71,6 @@ export const getUser = async (req: Request, res: Response) => {
       return res.status(404).json({ message: "Usuário não encontrado" });
     }
 
-    // Aqui, o avatar já estará incluído
     return res.status(200).json(user);
   } catch (error: unknown) {
     return res.status(500).json({ message: "Server error", error });
@@ -96,7 +88,6 @@ export const sendInvite = async (req: Request, res: Response) => {
       return res.status(400).json({ message: "Usuário não autenticado" });
     }
 
-    // Converte userId para string antes de passar para o serviço
     const friend = await sendInviteService(userId.toString(), friendId);
 
     return res
@@ -118,8 +109,6 @@ export const allInvites = async (req: Request, res: Response) => {
       return res.status(400).json({ message: "Usuário não autenticado" });
     }
 
-    console.log("USUARIO:", id); // Para debugging
-
     const invites = await allInvitesService(id);
 
     return res.status(200).json({ invites });
@@ -140,7 +129,6 @@ export const acceptInvite = async (req: Request, res: Response) => {
       return res.status(400).json({ message: "Usuário não autenticado" });
     }
 
-    // Converte userId para string antes de passar para o serviço
     const user = await acceptInviteService(userId.toString(), inviterId);
 
     return res.status(200).json({ message: "Convite aceito com sucesso" });
@@ -159,7 +147,6 @@ export const declineInvite = async (req: Request, res: Response) => {
       return res.status(400).json({ message: "Usuário não autenticado" });
     }
 
-    // Converte userId para string antes de passar para o serviço
     const user = await declineInviteService(userId.toString(), inviterId);
 
     return res.status(200).json({ message: "Convite recusado com sucesso" });
@@ -232,18 +219,15 @@ export const allFriends = async (req: Request, res: Response) => {
 
 export const uploadAvatar = async (req: Request, res: Response) => {
   try {
-    const { avatar } = req.body; // Espera receber a imagem em base64 no campo `avatar`
+    const { avatar } = req.body;
 
     if (!avatar) {
       return res.status(400).json({ message: "Avatar não fornecido." });
     }
 
-    // Faz o upload da imagem em base64 diretamente para o Cloudinary
     const result = await cloudinary.uploader.upload(avatar, {
-      upload_preset: "social", // Substitua pelo seu upload_preset se configurado no Cloudinary
+      upload_preset: "social",
     });
-
-    console.log("RESULTADO:", result.secure_url);
 
     const user = await User.findByIdAndUpdate(
       req?.user?._id,
@@ -251,10 +235,18 @@ export const uploadAvatar = async (req: Request, res: Response) => {
       { new: true }
     ).select("-password");
 
-    console.log("USUARIO COMPLETO LOGADO", req?.user?._id);
     res.json(user);
   } catch (err: any) {
     console.error(err);
     res.status(500).json({ message: "Erro no servidor" });
   }
+};
+
+export const unfriend = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const userId = req.user?._id as mongoose.Types.ObjectId;
+
+  try {
+    await unfriendService(id, userId.toString());
+  } catch {}
 };

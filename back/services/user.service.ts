@@ -144,3 +144,26 @@ export const getFriendPostsService = async (
 
   return friendPosts;
 };
+
+export const unfriendService = async (friendId: string, userId: string) => {
+  try {
+    const userLogged = await User.findById(userId);
+    const friend = await User.findById(friendId);
+
+    if (!userLogged || !friend) {
+      throw new Error("Usuário ou amigo não encontrado");
+    }
+
+    friend.friends = friend.friends.filter(
+      (friend) => friend.toString() !== userId
+    );
+    userLogged.friends = userLogged.friends.filter(
+      (friend) => friend.toString() !== friendId
+    );
+
+    await userLogged.save();
+    await friend.save();
+  } catch (err) {
+    throw err;
+  }
+};

@@ -5,6 +5,8 @@ import Message from "./message.model";
 export interface IConversation extends Document {
   members: Object[];
   messages: Object[];
+  lastMessage: object;
+  unreadMessages: number;
 }
 
 const conversationSchema: Schema<IConversation> = new mongoose.Schema(
@@ -22,6 +24,15 @@ const conversationSchema: Schema<IConversation> = new mongoose.Schema(
         default: [],
       },
     ],
+    lastMessage: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: Message,
+      default: null,
+    },
+    unreadMessages: {
+      type: Number,
+      default: 0,
+    },
   },
   {
     timestamps: true,

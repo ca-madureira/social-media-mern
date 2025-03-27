@@ -1,24 +1,35 @@
-import Conversation from "../models/conversation.model";
 import { Request, Response } from "express";
+import {
+  getAllUserConversationsService,
+  getConversationBetweenUsersService,
+} from "../services/conversation.service";
+import mongoose from "mongoose";
 
-export const getConversation = async (req: Request, res: Response) => {
+export const getAllUserConversations = async (req: Request, res: Response) => {
   try {
-    const senderId = req.user?._id;
-    const receiverId = req.params.id;
+    const user = req.user?._id as mongoose.Types.ObjectId;
 
-    if (!senderId || !receiverId) {
-      return res
-        .status(400)
-        .json({ message: "Sender ID ou Receiver ID inválido." });
-    }
+    const conversations = await getAllUserConversationsService(user.toString());
 
-    const conversation = await Conversation.findOne({
-      members: { $all: [senderId, receiverId] },
-    }).populate("messages");
+    return res.status(200).json(conversations);
+  } catch (error: any) {
+    console.error("Erro ao buscar as conversas:", error);
+    return res
+      .status(500)
+      .json({ message: "Erro ao buscar as conversas", error: error.message });
+  }
+};
 
-    if (!conversation) {
-      return res.status(404).json({ message: "Conversa não encontrada." });
-    }
+export const getConversationBetweenUsers = async (
+  req: Request,
+  res: Response
+) => {
+  const { senderId, receiverId } = req.body;
+  try {
+    const conversation = await getConversationBetweenUsersService({
+      senderId,
+      receiverId,
+    });
 
     res.status(200).json(conversation);
   } catch (error: any) {

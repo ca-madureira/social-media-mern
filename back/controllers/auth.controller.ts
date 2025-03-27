@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from "express";
+import { Request, Response } from "express";
 import { signRefreshToken } from "../middleware/auth";
 
 import {
@@ -8,7 +8,6 @@ import {
   verifyCodeService,
   updateUserPasswordService,
 } from "../services/auth.service";
-import User from "../models/user.model";
 
 export const createUser = async (req: Request, res: Response) => {
   try {
@@ -19,7 +18,7 @@ export const createUser = async (req: Request, res: Response) => {
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV !== "development",
-      sameSite: "strict",
+      sameSite: "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 dias
     });
 

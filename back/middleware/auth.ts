@@ -1,6 +1,6 @@
-import { Request, Response, NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
-import User, { IUser } from '../models/user.model';
+import { Request, Response, NextFunction } from "express";
+import jwt from "jsonwebtoken";
+import User, { IUser } from "../models/user.model";
 
 interface DecodedToken {
   id: string;
@@ -11,34 +11,30 @@ interface DecodedToken {
 export const isAuthenticatedToken = async (
   req: Request,
   res: Response,
-  next: NextFunction,
+  next: NextFunction
 ): Promise<Response | void> => {
   try {
-    // Obtém o token do cabeçalho 'Authorization'
-    const token = req.header('Authorization')?.split(' ')[1];
+    const token = req.header("Authorization")?.split(" ")[1];
 
     if (!token) {
-      return res.status(401).json({ msg: 'Autenticação inválida' });
+      return res.status(401).json({ msg: "Autenticação inválida" });
     }
 
-    // Verifica o token e decodifica o ID do usuário
     const decoded = jwt.verify(
       token,
-      process.env.ACCESS_TOKEN_SECRET as string,
+      process.env.ACCESS_TOKEN_SECRET as string
     ) as DecodedToken;
 
     if (!decoded) {
-      return res.status(401).json({ msg: 'Autenticação inválida' });
+      return res.status(401).json({ msg: "Autenticação inválida" });
     }
 
-    // Procura o usuário no banco de dados pelo ID decodificado
     const user: IUser | null = await User.findById(decoded.id);
 
     if (!user) {
-      return res.status(404).json({ msg: 'Usuário não encontrado' });
+      return res.status(404).json({ msg: "Usuário não encontrado" });
     }
 
-    // Associa o usuário encontrado ao req.user
     req.user = user;
     next();
   } catch (err) {
@@ -50,17 +46,17 @@ export const signToken = (user: IUser) => {
   const token = jwt.sign(
     { id: user._id, email: user.email },
     process.env.ACCESS_TOKEN_SECRET as string,
-    { expiresIn: '1h' }, // Tempo de expiração menor para o Access Token
+    { expiresIn: "1h" }
   );
 
-  return token; // Retorna o Access Token
+  return token;
 };
 
 export const signRefreshToken = (user: any) => {
   const refreshToken = jwt.sign(
     { id: user._id, email: user.email },
     process.env.REFRESH_TOKEN_SECRET as string,
-    { expiresIn: '7d' }, // Tempo de expiração do Refresh Token
+    { expiresIn: "7d" }
   );
 
   return refreshToken;

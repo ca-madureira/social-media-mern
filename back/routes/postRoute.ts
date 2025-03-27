@@ -6,7 +6,6 @@ import {
   deletePostById,
   updatePostById,
   votePost,
-  reactToPost,
   userVotedPost,
 } from "../controllers/post.controller";
 
@@ -19,8 +18,6 @@ postRoute.get("/:id", isAuthenticatedToken, getUserPosts);
 postRoute.delete("/delete/:id", isAuthenticatedToken, deletePostById);
 
 postRoute.put("/update/:id", isAuthenticatedToken, updatePostById);
-
-postRoute.put("/reaction/:id", isAuthenticatedToken, reactToPost);
 
 postRoute.put("/vote/:id", isAuthenticatedToken, votePost);
 
