@@ -1,4 +1,4 @@
-import { useState, FC } from "react";
+import { useState } from "react";
 import { AiOutlineUserDelete } from "react-icons/ai";
 import { IoLogOutOutline, IoSettingsSharp } from "react-icons/io5";
 import { useSelector, useDispatch } from "react-redux";
@@ -11,16 +11,20 @@ import { setUser } from "../redux/user/userSlice";
 import { FaHome, FaUserFriends } from "react-icons/fa";
 import { FaSearch } from "react-icons/fa";
 import { useSearchUsersQuery } from "../redux/auth/authApi";
+import { useSocket } from "../hooks/useSocket";
+import { UserSearch } from "../interfaces";
 import {
   useAllInvitesQuery,
   useAcceptInviteMutation,
   useDeclineInviteMutation,
 } from "../redux/user/userApi";
+import { User } from "../interfaces";
 
-const Header: FC = () => {
+const Header = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { user } = useSelector((state: any) => state.auth);
+
+  const user = useSelector((state: RootState) => state.user);
   const [openMenu, setOpenMenu] = useState(false);
   const [openInvites, setOpenInvites] = useState(false);
   const [openModalConfirm, setOpenModalConfirm] = useState(false);
@@ -28,7 +32,7 @@ const Header: FC = () => {
   const [declineInvite] = useDeclineInviteMutation();
   const [deleteAccount] = useDeleteAccountMutation();
   const auth = useSelector((state: RootState) => state.auth);
-  const [value, setValue] = useState(false);
+
   const id = auth.id;
   const { data = { invites: [] }, refetch } = useAllInvitesQuery({ id });
 
@@ -39,13 +43,17 @@ const Header: FC = () => {
     { skip: !searchTerm }
   );
 
+  const { logoutUser } = useSocket();
+
   const deleteUser = async () => {
-    await deleteAccount(user.id);
+    await deleteAccount(auth.id);
     navigate("/login");
   };
 
   const logout = () => {
+    logoutUser(id);
     dispatch(userLoggedOut());
+
     navigate("/login");
   };
 
@@ -69,23 +77,24 @@ const Header: FC = () => {
     if (!id) return;
     try {
       await acceptInvite({ id });
-      setValue(!value);
+
       refetch();
     } catch (error) {
       console.error("Erro ao aceitar o convite:", error);
     }
   };
 
-  const handleFriendClick = (friend: any) => {
+  const handleFriendClick = (friend: UserSearch) => {
     dispatch(setUser(user));
     navigate(`/${friend._id}`);
+    console.log(friend);
   };
 
   const decline = async (id: string | undefined) => {
     if (!id) return;
     try {
       await declineInvite({ id });
-      setValue(!value);
+
       refetch();
     } catch (error) {
       console.error("Erro ao recusar o convite:", error);
@@ -114,9 +123,9 @@ const Header: FC = () => {
               searchResults?.users &&
               searchResults.users.length > 0 && (
                 <div className="absolute left-0 top-full mt-2 bg-white w-full z-10 shadow-lg rounded-md md:p-4">
-                  {searchResults.users.map((user: any) => (
+                  {searchResults.users.map((user: UserSearch) => (
                     <div
-                      key={user.id}
+                      key={user._id}
                       className="flex items-start cursor-pointer hover:bg-purple-100 p-2"
                       onClick={() => handleFriendClick(user)}
                     >
@@ -202,20 +211,18 @@ const Header: FC = () => {
                   </header>
                   <div className="flex justify-center gap-2">
                     <button
-                      className={`p-2 ${
-                        value ? "bg-orange-600" : "bg-red-500"
+                      className={`p-2 bg-orange-600
                       }`}
                       onClick={() => decline(invite._id)}
                     >
-                      {value ? "Recusou convite" : "Recusar"}
+                      Recusar
                     </button>
                     <button
-                      className={`p-2 ${
-                        value ? "bg-green-600" : "bg-purple-500"
+                      className={`p-2 bg-purple-500
                       }`}
                       onClick={() => accept(invite._id)}
                     >
-                      {value ? "Amizade aceita" : "Aceitar"}
+                      Aceitar
                     </button>
                   </div>
                 </article>

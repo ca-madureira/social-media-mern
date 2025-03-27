@@ -1,56 +1,163 @@
+import Slider from "react-slick";
+import { IoChatboxEllipsesSharp } from "react-icons/io5";
 import { useDispatch } from "react-redux";
+import { toggleChat } from "../redux/chat/chatSlice";
+import { FriendData } from "../interfaces";
+import { useSelector } from "react-redux";
+import { RootState } from "../redux/store";
 import { useNavigate } from "react-router-dom";
 import { setUser } from "../redux/user/userSlice";
-import { IoChatboxEllipsesOutline } from "react-icons/io5";
 
-import { toggleChat } from "../redux/chat/chatSlice";
-import { FriendData, UserData } from "../interfaces";
+const sliderSettings = {
+  dots: false,
+  infinite: false,
+  speed: 500,
+  slidesToShow: 5,
+  slidesToScroll: 1,
+  centerMode: true,
+  focusOnSelect: true,
+  centerPadding: "0",
+  responsive: [
+    {
+      breakpoint: 1024,
+      settings: {
+        slidesToShow: 3,
+        slidesToScroll: 1,
+      },
+    },
+    {
+      breakpoint: 768,
+      settings: {
+        slidesToShow: 3,
+        slidesToScroll: 3,
+      },
+    },
+    {
+      breakpoint: 480,
+      settings: {
+        slidesToShow: 3,
+        slidesToScroll: 3,
+      },
+    },
+  ],
+};
 
-const Friends = ({ user }: any) => {
+const Friends = ({ user }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // Função para ativar o chat com o amigo
+  const auth = useSelector((state: RootState) => state.auth?.id); // ID do usuário logado
+  const onlineUsers = useSelector(
+    (state: RootState) => state.connection.onlineUsers
+  );
+
   const handleActiveChat = (friend: FriendData) => {
-    // Disparando o toggleChat com o nome e avatar do amigo
-    dispatch(toggleChat({ name: friend.name, avatar: friend.avatar }));
+    dispatch(
+      toggleChat({ name: friend.name, avatar: friend.avatar, id: friend._id })
+    );
   };
 
-  // Função para navegação e envio de dados do usuário
   const handleFriendClick = (friend: FriendData) => {
     dispatch(setUser(user)); // Envia o usuário para o Redux
     navigate(`/${friend._id}`); // Navega para o perfil do amigo
   };
 
+  const shouldShowSlider = user?.friends?.length > 1;
+
   return (
-    <aside className="md:w-full bg-white p-4 shadow-md shadow-purple-600">
-      <h2 className="text-lg font-bold mb-2 text-purple-700">Amigos</h2>
-      <section className="flex justify-evenly">
-        {user?.friends?.length > 0 ? (
-          user.friends.map((friend: FriendData) => (
-            <div
-              key={friend._id}
-              className="bg-purple-300 flex flex-col items-center p-2 cursor-pointer w-24 mb-2"
-            >
-              <img
-                className="w-20 h-20 rounded-md"
-                src={friend.avatar}
-                alt={`${friend.name}'s profile`}
-                onClick={() => handleFriendClick(friend)} // Navega para o perfil
-              />
-              <div className="flex items-center gap-2">
-                <p className="text-purple-600 font-semibold">{friend.name}</p>
-                <IoChatboxEllipsesOutline
-                  className="text-purple-700 cursor-pointer hover:scale-110 transition-transform"
-                  onClick={() => handleActiveChat(friend)} // Ativa o chat com o amigo
-                />
+    <aside className="w-full h-[60%] bg-white shadow-md shadow-purple-600 p-2">
+      <h2 className="text-lg font-medium mb-4 text-purple-700">Amigos</h2>
+      {shouldShowSlider ? (
+        <Slider {...sliderSettings}>
+          {user?.friends?.map((friend: FriendData) => {
+            const isOnline = onlineUsers.some(
+              (user) => user.userId === friend._id
+            );
+            return (
+              <div
+                key={friend._id}
+                className="flex flex-col items-center p-2 cursor-pointer"
+              >
+                <div
+                  className={`relative w-16 h-16 rounded-full mb-2 ${
+                    isOnline
+                      ? "border-2 border-lime-500 "
+                      : "border-2 border-purple-200"
+                  }`}
+                >
+                  <img
+                    className="w-full h-full object-cover rounded-full hover:scale-110 transition-transform"
+                    src={friend.avatar}
+                    alt={`${friend.name}'s profile`}
+                    onClick={() => handleFriendClick(friend)}
+                  />
+                </div>
+                <div className="flex items-center gap-2">
+                  <p className="text-purple-600 font-semibold text-sm truncate">
+                    {friend.name.split(" ")[0]}
+                  </p>
+
+                  {auth !== friend._id && (
+                    <IoChatboxEllipsesSharp
+                      className={`cursor-pointer hover:scale-110 transition-transform ${
+                        isOnline
+                          ? "text-lime-500 animate-pulse"
+                          : "text-purple-300"
+                      }`}
+                      onClick={() => handleActiveChat(friend)}
+                    />
+                  )}
+                </div>
               </div>
-            </div>
-          ))
-        ) : (
-          <p>Não há amigos</p>
-        )}
-      </section>
+            );
+          })}
+        </Slider>
+      ) : (
+        <div className="flex space-x-4">
+          {user?.friends?.map((friend: FriendData) => {
+            const isOnline = onlineUsers.some(
+              (user) => user.userId === friend._id
+            );
+            return (
+              <div
+                key={friend._id}
+                className="flex flex-col items-center p-2 cursor-pointer"
+              >
+                <div
+                  className={`relative w-16 h-16 rounded-full mb-2 ${
+                    isOnline
+                      ? "border-2 border-lime-500 "
+                      : "border-2 border-purple-200"
+                  }`}
+                >
+                  <img
+                    className="w-full h-full object-cover rounded-full hover:scale-110 transition-transform"
+                    src={friend.avatar}
+                    alt={`${friend.name}'s profile`}
+                    onClick={() => handleFriendClick(friend)}
+                  />
+                </div>
+                <div className="flex items-center gap-2">
+                  <p className="text-purple-600 font-semibold text-sm truncate">
+                    {friend.name.split(" ")[0]}
+                  </p>
+
+                  {auth !== friend._id && (
+                    <IoChatboxEllipsesSharp
+                      className={`cursor-pointer hover:scale-110 transition-transform ${
+                        isOnline
+                          ? "text-lime-500 animate-pulse"
+                          : "text-gray-500"
+                      }`}
+                      onClick={() => handleActiveChat(friend)}
+                    />
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </aside>
   );
 };

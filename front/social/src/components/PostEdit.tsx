@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { UserProfile } from "../interfaces";
+import { useCreatePostMutation } from "../redux/post/postApi";
 
 interface UserData {
   _id: string;
@@ -15,8 +16,19 @@ interface PostEditProps {
   user: UserData;
 }
 
-const PostEdit = ({ user, setOpenModal }: PostEditProps) => {
-  const [post, setPost] = useState("");
+const PostEdit = ({ user }: PostEditProps) => {
+  const [content, setContent] = useState("");
+
+  const [createPost] = useCreatePostMutation();
+
+  const handleSubmit = async () => {
+    try {
+      await createPost({ content }).unwrap();
+      setContent("");
+    } catch (err) {
+      console.error("Erro ao criar post:", err);
+    }
+  };
 
   return (
     <section className="w-full flex gap-2 bg-white shadow-purple-600 shadow-md p-2">
@@ -29,14 +41,39 @@ const PostEdit = ({ user, setOpenModal }: PostEditProps) => {
         }`}
         alt="User Avatar"
       />
-      <input
+      <div className="w-full">
+        <textarea
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+          maxLength={250}
+          placeholder="O que está pensando?"
+          className={
+            "resize-none font-mooli text-sm text-fuchsia-800 outline-none border-2 border-purple-200 w-full p-2"
+          }
+        />
+
+        <div className="flex gap-2 items-center justify-between">
+          <div className="flex gap-2">
+            <p className="text-sm text-purple-800">{content.length} / 250</p>
+          </div>
+
+          <button
+            className="bg-purple-400 text-sm px-2 py-1 rounded-md text-white font-semibold"
+            onClick={handleSubmit}
+          >
+            Postar
+          </button>
+        </div>
+      </div>
+
+      {/* <input
         type="text"
         placeholder="O que está pensando?"
         value={post}
         onChange={(e) => setPost(e.target.value)}
         onFocus={() => setOpenModal(true)}
         className="w-full h-12 resize-none shadow-purple-400 shadow-sm rounded-md outline-none p-2"
-      />
+      /> */}
     </section>
   );
 };

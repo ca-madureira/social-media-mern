@@ -7,7 +7,6 @@ const ProtectedRoute = () => {
 
   if (!token) {
     return <Navigate to="/login" />;
-    console.log(token);
   }
 
   return <Outlet />;

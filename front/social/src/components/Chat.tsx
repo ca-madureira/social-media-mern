@@ -1,33 +1,163 @@
-import React from "react";
+import { useState, useRef, useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState } from "../redux/store";
+import { useGetConversationBetweenUsersQuery } from "../redux/chat/conversationApi";
+import { useCreateMessageMutation } from "../redux/chat/messageApi";
+import { useSocket } from "../hooks/useSocket";
+import { toggleChat } from "../redux/chat/chatSlice";
+import { IoMdCloseCircleOutline } from "react-icons/io";
+import { RiSendPlaneFill } from "react-icons/ri";
 
-// Tipagem para as props do componente Chat
-interface ChatProps {
-  name: string;
-  avatar: string;
-}
+const Chat = () => {
+  const [message, setMessage] = useState("");
+  const dispatch = useDispatch();
 
-const Chat: React.FC<ChatProps> = ({ name, avatar }) => {
+  const senderId = useSelector((state: RootState) => state.auth.id);
+  const receiverId = useSelector((state: RootState) => state.chat.id);
+  const friend = useSelector((state: RootState) => state.chat);
+  const usersOnline = useSelector(
+    (state: RootState) => state.connection.onlineUsers
+  );
+  const chatActive = useSelector((state: RootState) => state.chat.chatActive);
+
+  const { socket, sendMessage } = useSocket();
+
+  const {
+    data: conversations,
+    isLoading,
+    isError,
+  } = useGetConversationBetweenUsersQuery({ senderId, receiverId });
+
+  const isUserOnline = usersOnline.some((user) => user.userId === receiverId);
+
+  const [createMessage] = useCreateMessageMutation();
+
+  const handleSendMessage = () => {
+    if (message.trim()) {
+      const conversationId = "some-conversation-id";
+
+      sendMessage(senderId, receiverId, conversationId, message);
+
+      createMessage({ senderId, receiverId, message })
+        .then(() => {
+          setMessage("");
+        })
+        .catch((error) => {
+          console.error("Erro ao enviar a mensagem:", error);
+        });
+    }
+  };
+
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    scrollRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [conversations?.messages]);
+
+  useEffect(() => {
+    if (socket) {
+      socket.on(
+        "receive-message",
+        (data: { senderId: string; message: string }) => {
+          console.log("Mensagem recebida:", data);
+        }
+      );
+
+      return () => {
+        socket.off("receive-message");
+      };
+    }
+  }, [socket]);
+
+  const handleCloseChat = () => {
+    dispatch(toggleChat({ name: "", avatar: "", id: "" }));
+  };
+
+  if (!chatActive) return null;
+
   return (
-    <section className="absolute right-4 bottom-0 z-99 bg-white w-[25%] p-2 shadow-md shadow-purple-600">
-      <section className="flex items-center gap-2 bg-purple-500 px-2">
+    <section className="absolute right-4 bottom-0 z-99 bg-white w-[25%] shadow-md shadow-purple-600">
+      <section className="relative flex items-center gap-2 bg-purple-500 px-2">
         <img
-          className="w-8 h-8 border border-2 rounded-full border-purple-400"
-          src={
-            avatar ||
-            "https://static.vecteezy.com/system/resources/thumbnails/048/216/761/small/modern-male-avatar-with-black-hair-and-hoodie-illustration-free-png.png"
-          } // Usando o avatar dinâmico
+          className={`w-8 h-8 border border-2 rounded-full ${
+            isUserOnline ? "border-lime-400" : "border-purple-400"
+          }`}
+          src={friend.avatar || "default-avatar.png"}
+          alt={`${friend.name}'s avatar`}
         />
         <div>
-          <p className="text-white font-bold">{name}</p>{" "}
-          {/* Usando o nome dinâmico */}
-          <p className="text-sm font-light text-green-200">online</p>
+          <p className="text-white font-bold">{friend.name}</p>
+          <p className={`${isUserOnline ? "text-lime-400 font-semibold" : ""}`}>
+            {isUserOnline ? "online" : "offline"}
+          </p>
+        </div>
+        <div
+          className="absolute right-4 text-white cursor-pointer"
+          onClick={handleCloseChat}
+        >
+          <IoMdCloseCircleOutline className="w-6 h-6 hover:text-purple-200" />
         </div>
       </section>
-      <section className="overflow-y-auto h-[250px]">ola</section>
 
-      <section className="flex">
-        <input className="border w-[90%] outline-none" />
-        <button className="bg-green-200 text-sm p-2">Enviar</button>
+      <section className="overflow-y-auto h-[250px] p-2">
+        {isLoading ? (
+          <p>Carregando mensagens...</p>
+        ) : isError ? (
+          <p>Erro ao carregar mensagens</p>
+        ) : conversations?.messages.length > 0 ? (
+          conversations.messages.map(
+            (
+              message: {
+                _id: string;
+                senderId: string;
+                receiverId: string;
+                message: string;
+                read: boolean;
+              },
+              index: number
+            ) => (
+              <div
+                key={index}
+                className={`flex ${
+                  message.senderId === senderId
+                    ? "justify-end"
+                    : "justify-start"
+                } mb-2`}
+              >
+                <div
+                  className={`max-w-[70%] p-2  ${
+                    message.senderId === senderId
+                      ? "bg-gradient-to-r from-violet-400 to-indigo-300 text-white font-medium"
+                      : "bg-gradient-to-r from-gray-200 to-violet-400 text-left font-medium"
+                  } break-words`}
+                >
+                  <strong>
+                    {message.senderId === senderId ? "Você" : friend.name}:
+                  </strong>{" "}
+                  {message.message}
+                </div>
+              </div>
+            )
+          )
+        ) : (
+          <p>Sem mensagens no momento</p>
+        )}
+
+        <div ref={scrollRef}></div>
+      </section>
+
+      <section className="flex gap-2 p-2">
+        <input
+          className="border w-[90%] outline-none border border-purple-300"
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+        />
+        <button
+          className="bg-purple-700 text-sm p-2 text-white font-bold"
+          onClick={handleSendMessage}
+        >
+          <RiSendPlaneFill />
+        </button>
       </section>
     </section>
   );

@@ -1,19 +1,14 @@
 import { useState, useEffect } from "react";
-import social from "../assets/social-media.svg";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+
+import social from "../assets/social-media.svg";
 import {
   useLoginMutation,
   useRegisterUserMutation,
 } from "../redux/auth/authApi";
-
-import { toast } from "react-toastify";
-
-interface UserData {
-  name: string;
-  email: string;
-  password: string;
-}
+import { UserAuth } from "../interfaces";
 
 const Authentication = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -41,7 +36,7 @@ const Authentication = () => {
   ] = useRegisterUserMutation();
   const navigate = useNavigate();
 
-  const submitHandler = async (data: UserData) => {
+  const submitHandler = async (data: UserAuth) => {
     const { name, email, password } = data;
 
     try {

@@ -1,8 +1,12 @@
 import React, { useState } from "react";
-import { useSendInviteMutation } from "../redux/user/userApi";
+import {
+  useSendInviteMutation,
+  useUnfriendMutation,
+} from "../redux/user/userApi";
 import { useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
+
 import { RootState } from "../redux/store";
-import { RiEmotionHappyFill } from "react-icons/ri";
 import { AiOutlineEdit } from "react-icons/ai";
 import { useUpdateAvatarMutation } from "../redux/profile/profileApi";
 import { UserProfile, ProfileCardProps } from "../interfaces";
@@ -10,8 +14,11 @@ import { UserProfile, ProfileCardProps } from "../interfaces";
 const ProfileCard: React.FC<ProfileCardProps> = ({ user, isLoggedIn }) => {
   const [sendInvite, { isLoading, error }] = useSendInviteMutation();
   const [msg, setMsg] = useState(false);
+  const [isUnFriend, setIsUnfriend] = useState(false);
   const auth = useSelector((state: RootState) => state.auth);
   const [updateAvatar] = useUpdateAvatarMutation();
+  const [unfriend] = useUnfriendMutation();
+  const { id } = useParams();
 
   const isInvite = user?.invites?.some(
     (invite: UserProfile) => invite.email === auth?.email
@@ -53,6 +60,20 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ user, isLoggedIn }) => {
     } catch (err) {
       console.error("Falha ao enviar o convite:", err);
     }
+    console.log(user);
+  };
+
+  const handleUnfriend = async () => {
+    try {
+      setIsUnfriend(true);
+      await unfriend({ id: user._id }).unwrap();
+
+      console.log(isUnFriend);
+    } catch (err) {
+      console.error("Erro ao desfazer amizade:", err);
+    }
+
+    console.log(isUnFriend);
   };
 
   return (
@@ -92,10 +113,13 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ user, isLoggedIn }) => {
 
       {!isLoggedIn && (
         <>
-          {isFriend ? (
-            <p className="bg-purple-100 text-purple-500 font-semibold w-full flex justify-center items-center border-2 border-l-purple-400 border-r-purple-400 border-t-purple-200 border-b-purple-200 p-2 gap-2">
-              <RiEmotionHappyFill className="text-purple-500 w-6 h-6" /> Amigos
-            </p>
+          {isFriend && !isUnFriend ? (
+            <button
+              className="bg-violet-300 p-2 text-white font-medium"
+              onClick={handleUnfriend}
+            >
+              Desfazer Amizade
+            </button>
           ) : isInvite ? (
             <p className="bg-purple-400 text-white font-semibold px-2 rounded-md uppercase py-2">
               Convite enviado
@@ -106,6 +130,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ user, isLoggedIn }) => {
                 msg ? "bg-green-400" : "bg-purple-500"
               }`}
               onClick={sendInviteFriend}
+              // onClick={showLogged}
               disabled={isLoading}
             >
               {isLoading ? "Enviando..." : msg ? "Enviado" : "Fazer Amizade"}

@@ -1,23 +1,24 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
+import { FaRegHeart, FaHeart } from "react-icons/fa";
+import { TiDelete } from "react-icons/ti";
+import { RiEditCircleFill } from "react-icons/ri";
+
 import {
   useGetUserPostsQuery,
   useDeletePostByIdMutation,
   useEditPostMutation,
   useVotePostMutation,
 } from "../redux/post/postApi";
-import { FaRegHeart, FaEdit, FaHeart } from "react-icons/fa";
-import { MdDelete } from "react-icons/md";
 import { RootState } from "../redux/store";
 import calculateTimeAgo from "../utils/calculaTimeAgo";
-import ReactQuill from "react-quill";
 import { useSelector } from "react-redux";
 import { PostData } from "../interfaces";
 
 const Post = () => {
-  const { id } = useParams<{ id: string }>();
-  console.log("ID NA URL", id);
-  const { data, isLoading, isError } = useGetUserPostsQuery({ id });
+  const { id } = useParams();
+
+  const { data, isLoading, isError } = useGetUserPostsQuery({ id: id! });
 
   const auth = useSelector((state: RootState) => state.auth?.id);
 
@@ -27,6 +28,7 @@ const Post = () => {
 
   const [modeEdit, setModeEdit] = useState<string | null>(null);
   const [content, setContent] = useState<string>("");
+
   const [toggle, setToggle] = useState(false);
 
   if (isLoading) {
@@ -47,10 +49,6 @@ const Post = () => {
     setToggle(!toggle);
   };
 
-  const handleContentChange = (newContent: string) => {
-    setContent(newContent);
-  };
-
   const handleSaveEdit = async (postId: string) => {
     await editPost({ id: postId, content });
     setModeEdit(null);
@@ -59,7 +57,6 @@ const Post = () => {
   const handleVote = async (postId: string) => {
     await votePost({ id: postId });
   };
-  console.log(data);
 
   return (
     <section className="w-full md:space-y-4">
@@ -68,15 +65,19 @@ const Post = () => {
           key={index}
           className="bg-white shadow-purple-600 shadow-md rounded-md p-1"
         >
-          <header className="flex gap-2 justify-end">
-            <FaEdit
-              className="text-green-500 font-semibold hover:text-green-800 cursor-pointer"
-              onClick={() => handleEdit(post._id, post.content)}
-            />
-            <MdDelete
-              className="text-red-600 font-semibold hover:text-red-800 cursor-pointer"
-              onClick={() => deletePost(post._id)}
-            />
+          <header className="flex gap-2 justify-end items-center">
+            {post.author._id === auth && (
+              <>
+                <RiEditCircleFill
+                  className="w-4 h-4 text-violet-400 font-semibold hover:text-violet-300 cursor-pointer"
+                  onClick={() => handleEdit(post._id, post.content)}
+                />
+                <TiDelete
+                  className="w-5 h-5 text-violet-400 font-semibold hover:text-violet-300 cursor-pointer"
+                  onClick={() => deletePost(post._id)}
+                />
+              </>
+            )}
           </header>
           <section className="flex gap-2 border-b-2 border-purple-200 p-1">
             <img
@@ -97,7 +98,16 @@ const Post = () => {
             <div className="p-4 space-y-2">
               {modeEdit === post._id && toggle ? (
                 <>
-                  <ReactQuill value={content} onChange={handleContentChange} />
+                  <textarea
+                    value={content}
+                    onChange={(e) => setContent(e.target.value)}
+                    maxLength={250}
+                    placeholder="O que está pensando?"
+                    className="resize-none font-mooli text-sm text-violet-800 outline-none border-2 border-purple-200 w-full p-2"
+                  />
+                  <p className="text-sm text-purple-800">
+                    {content.length} / 250
+                  </p>
                   <button
                     className="bg-purple-500 text-white p-2 text-sm font-semibold rounded-md"
                     onClick={() => handleSaveEdit(post._id)}
@@ -106,10 +116,9 @@ const Post = () => {
                   </button>
                 </>
               ) : (
-                <div
-                  className="max-w-full h-auto"
-                  dangerouslySetInnerHTML={{ __html: post.content }}
-                />
+                <p className="font-mooli text-sm text-violet-800">
+                  {post.content}
+                </p>
               )}
             </div>
             <footer className="flex">

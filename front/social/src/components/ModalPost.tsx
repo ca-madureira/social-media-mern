@@ -34,7 +34,7 @@ const ModalPost: React.FC<ModalProps> = ({ openModal, setOpenModal }) => {
 
   const handleSubmit = async () => {
     try {
-      await createPost({ content }).unwrap();
+      await createPost(content).unwrap();
       setOpenModal(false);
       setContent("");
       setCharCount(0);

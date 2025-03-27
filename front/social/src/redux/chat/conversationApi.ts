@@ -1,20 +1,27 @@
 import { apiSlice } from "../api/apiSlice";
-
-export interface ConversationData {
-  receiverId: string; // Agora somente receiverId é passado para o corpo da requisição
-}
+import { ConversationState } from "../../interfaces";
 
 const conversationApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    // Endpoint para buscar conversa, se necessário
-    getConversation: builder.query<any, { id: string }>({
-      query: ({ id }) => ({
-        url: `/conversations/${id}`,
+    getConversationBetweenUsers: builder.query<any, ConversationState>({
+      query: ({ senderId, receiverId }) => ({
+        url: `/conversations/`,
+        method: "POST",
+        body: { senderId, receiverId },
+      }),
+      providesTags: ["messages"],
+    }),
+    getAllUserConversations: builder.query<any, void>({
+      query: () => ({
+        url: `/conversations/friends`,
         method: "GET",
       }),
+      providesTags: ["messages"],
     }),
   }),
 });
 
-export const { useDeleteConversationMutation, useGetConversationQuery } =
-  conversationApi;
+export const {
+  useGetConversationBetweenUsersQuery,
+  useGetAllUserConversationsQuery,
+} = conversationApi;

@@ -6,11 +6,12 @@ import {
   SearchParams,
   InvitesResponse,
   User,
+  UserSearch,
 } from "../../interfaces";
 
 export const userApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    searchFriends: builder.query<User[], SearchParams>({
+    searchFriends: builder.query<UserSearch[], SearchParams>({
       query: (params) => ({
         url: "/user/search",
         params,
@@ -73,6 +74,12 @@ export const userApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ["invites", "user"],
     }),
+    unfriend: builder.mutation<void, IdInvite>({
+      query: ({ id }) => ({
+        url: `/user/unfriend/${id}`,
+        method: "PUT",
+      }),
+    }),
     declineInvite: builder.mutation<void, IdInvite>({
       query: ({ id }) => ({
         url: `/user/decline/${id}`,
@@ -95,6 +102,7 @@ export const {
   useSendInviteMutation,
   useAcceptInviteMutation,
   useDeclineInviteMutation,
+  useUnfriendMutation,
   useAllInvitesQuery,
   useGetUserQuery,
 } = userApi;

@@ -13,6 +13,12 @@ export interface User {
   friends: UserProfile[];
 }
 
+export interface UserAuth {
+  name: string;
+  email: string;
+  password: string;
+}
+
 export interface ProfileCardProps {
   user: User;
   isLoggedIn: boolean;
@@ -22,11 +28,16 @@ export interface PostData {
   _id: string;
   content: string;
   author: {
+    _id: string;
     avatar: string;
     name: string;
   };
   createdAt: string;
   votes: string[];
+}
+
+export interface PostItem {
+  content: string;
 }
 
 export interface ModalProps {
@@ -63,7 +74,7 @@ export interface AuthRegister {
 }
 
 export interface SearchResponse {
-  users: User[];
+  users: UserSearch[];
 }
 
 export interface SearchParams {
@@ -73,10 +84,6 @@ export interface SearchParams {
 
 export interface IdUser {
   id: string;
-}
-
-export interface PostData {
-  content: string;
 }
 
 export interface PostState {
@@ -103,4 +110,44 @@ export interface InvitePending {
 
 export interface InvitesResponse {
   invites: InvitePending[];
+}
+
+export interface IConversation {
+  _id: string;
+  members: IUser[];
+  messages: IMessage[];
+  lastMessage: IMessage;
+  unreadMessages: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface IMessage {
+  _id: string;
+  senderId: IUser;
+  receiverId: IUser;
+  message: string;
+  read: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface IUser {
+  _id: string;
+  name: string;
+  avatar: string;
+  email: string;
+}
+
+export interface UserSocket {
+  userId: string;
+  socketId: string;
+}
+
+export interface UserSearch {
+  _id: string;
+  name: string;
+  email: string;
+  avatar: string;
+  friends: string[];
 }

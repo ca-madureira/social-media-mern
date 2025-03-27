@@ -1,11 +1,17 @@
 import { apiSlice } from "../api/apiSlice";
 import { getUserPosts } from "./postSlice";
 
-import { IdPost, PostState, PostData, IdUser } from "../../interfaces";
+import {
+  IdPost,
+  PostState,
+  PostData,
+  IdUser,
+  PostItem,
+} from "../../interfaces";
 
 const postApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    createPost: builder.mutation<void, PostData>({
+    createPost: builder.mutation<void, PostItem>({
       query: (postData) => ({
         url: "/posts/create",
         method: "POST",
@@ -40,6 +46,7 @@ const postApi = apiSlice.injectEndpoints({
         method: "DELETE",
         credentials: "include" as const,
       }),
+      invalidatesTags: ["posts"],
     }),
     editPost: builder.mutation<void, { id: string; content: string }>({
       query: ({ id, content }) => ({
@@ -48,6 +55,7 @@ const postApi = apiSlice.injectEndpoints({
         body: { content },
         credentials: "include" as const,
       }),
+      invalidatesTags: ["posts"],
     }),
     votePost: builder.mutation<void, { id: string }>({
       query: ({ id }) => ({

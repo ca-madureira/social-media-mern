@@ -46,9 +46,7 @@ export const authApi = apiSlice.injectEndpoints({
             })
           );
         } catch (error: unknown) {
-          // Usando 'unknown'
           if (error instanceof Error) {
-            // Verificando se é uma instância de Error
             console.error("Erro ao processar a solicitação:", error.message);
           } else {
             console.error("Erro desconhecido:", error);
@@ -62,11 +60,12 @@ export const authApi = apiSlice.injectEndpoints({
         method: "POST",
         body: { email, password },
       }),
+
       async onQueryStarted(_, { queryFulfilled, dispatch }) {
         try {
           const result = await queryFulfilled;
 
-          console.log("CONTEUDO PARA NAO PERDER: ", result.data.user.id);
+          console.log("CONTEUDO PARA NAO PERDER: ", result);
 
           dispatch(
             userAuthentication({
@@ -90,9 +89,7 @@ export const authApi = apiSlice.injectEndpoints({
             })
           );
         } catch (error: unknown) {
-          // Usando 'unknown'
           if (error instanceof Error) {
-            // Verificando se é uma instância de Error
             console.error("Erro ao processar a solicitação:", error.message);
           } else {
             console.error("Erro desconhecido:", error);
@@ -100,7 +97,7 @@ export const authApi = apiSlice.injectEndpoints({
         }
       },
     }),
-    deleteAccount: builder.mutation<void, IdUser>({
+    deleteAccount: builder.mutation<void, string>({
       query: (idUser) => ({
         url: `/user/delete/${idUser}`,
         method: "DELETE",
@@ -130,14 +127,14 @@ export const authApi = apiSlice.injectEndpoints({
         body: data,
       }),
     }),
-    verifyCode: builder.mutation<void, string>({
+    verifyCode: builder.mutation<void, { email: string; code: string }>({
       query: (data) => ({
         url: "/auth/verifyCode",
         method: "POST",
         body: data,
       }),
     }),
-    updatePass: builder.mutation<void, string>({
+    updatePass: builder.mutation<void, { email: string; pass: string }>({
       query: (data) => ({
         url: "/auth/updatePass",
         method: "PUT",

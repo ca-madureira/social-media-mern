@@ -1,7 +1,7 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 export interface UserData {
-  id: string;
+  _id: string;
   name: string;
   email: string;
   avatar: string; // Adicione o campo avatar aqui
@@ -10,16 +10,16 @@ export interface UserData {
 }
 
 const initialState: UserData = {
-  id: '',
-  name: '',
-  email: '',
-  avatar: '',
+  _id: "",
+  name: "",
+  email: "",
+  avatar: "",
   friends: [],
   invites: [],
 };
 
 const UserSlice = createSlice({
-  name: 'user',
+  name: "user",
   initialState,
   reducers: {
     setUser: (state, action: PayloadAction<UserData>) => {
