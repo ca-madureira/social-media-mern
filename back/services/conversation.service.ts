@@ -33,7 +33,7 @@ export const getAllUserConversationsService = async (user: string) => {
   }
 
   const conversations = await Conversation.find({
-    members: user,
+    "lastMessage.senderId": user, // Filtra para apenas conversas onde o user é o senderId
   }).populate({
     path: "lastMessage",
     populate: {

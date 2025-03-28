@@ -139,15 +139,26 @@ export interface IUser {
   email: string;
 }
 
-export interface UserSocket {
-  userId: string;
-  socketId: string;
-}
-
 export interface UserSearch {
   _id: string;
   name: string;
   email: string;
   avatar: string;
   friends: string[];
+}
+
+/**tipos do modulo Chat */
+
+export interface UserSocket {
+  userId: string;
+  socketId: string;
+}
+
+export interface UserSocketState {
+  onlineUsers: UserSocket[];
+}
+
+export interface ConversationState {
+  senderId: string;
+  receiverId: string;
 }

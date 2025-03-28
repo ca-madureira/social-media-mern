@@ -1,8 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { UserSocket } from "../../interfaces";
-import { OnlineUsersState } from "../../interfaces";
+import { UserSocket, UserSocketState } from "../../interfaces";
 
-const initialState: OnlineUsersState = {
+const initialState: UserSocketState = {
   onlineUsers: [],
 };
 

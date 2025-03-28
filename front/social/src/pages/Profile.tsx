@@ -13,6 +13,7 @@ import ProfileCard from "../components/ProfileCard";
 import Chat from "../components/Chat";
 import ModalPost from "../components/ModalPost";
 import Conversations from "../components/Conversations";
+import { UserOn } from "../components/UserOn";
 
 const Profile = () => {
   const [openModal, setOpenModal] = useState(false);
@@ -52,6 +53,7 @@ const Profile = () => {
 
           <section className="w-full md:w-[35%] flex flex-col gap-4">
             <Friends user={userData} />
+            <UserOn />
 
             {isLoggedIn && (
               <section className="p-4 bg-white shadow-md shadow-purple-600 flex flex-col gap-2 h-[70%] overflow-y-auto">
