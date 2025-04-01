@@ -118,14 +118,17 @@ export const loginUserService = async (credentials: LoginUserData) => {
 };
 
 export const sendForgotPasswordCodeService = async (email: string) => {
+
   const user = await User.findOne({ email });
+
 
   if (!user) {
     throw new Error("Usuário não existe");
+
   }
 
   const existingToken = await PasswordResetToken.findOne({
-    userId: user._id,
+    userId: user?._id,
     expiresAt: { $gt: new Date() }, // Token ainda válido
   });
 
@@ -140,16 +143,15 @@ export const sendForgotPasswordCodeService = async (email: string) => {
   } else {
     // Criar um novo token se não existir um ativo
     await new PasswordResetToken({
-      userId: user._id,
+      userId: user?._id,
       token: codeValue,
       expiresAt,
     }).save();
   }
 
-  // Enviar o email com o código
   const info = await transport.sendMail({
     from: process.env.NODE_CODE_SENDING_EMAIL_ADDRESS,
-    to: user.email,
+    to: user?.email,
     subject: "Código para recuperação de senha",
     html: `<h1>${codeValue}</h1>`,
   });
