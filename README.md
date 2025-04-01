@@ -1,119 +1,125 @@
-## 💻 AmizApp - Conecte-se e compartilhe momentos!
+#  AmizApp - Conecte-se e compartilhe momentos!
 
 ##  Sobre o Projeto
 
-O AmizApp é uma rede social totalmente funcional que criei para aprimorar minhas habilidades em desenvolvimento web com a stack MERN (MongoDB, Express.js, React e Node.js). Através deste projeto, pude construir uma aplicação web dinâmica e interativa do zero, aprofundando meus conhecimentos em cada etapa do processo.
+O AmizApp é uma rede social completa, desenvolvida com a stack MERN (MongoDB, Express.js, React e Node.js), aprimorada com a comunicação em tempo real via Socket.IO. Este projeto foi criado para consolidar e expandir minhas habilidades em desenvolvimento web, proporcionando uma experiência de usuário dinâmica e interativa.
 
-**Funcionalidades da Versão 1.0:**
+**Funcionalidades Principais:**
 
-* **Cadastre-se** informando seu e-mail e criando uma senha segura.
-* **Acesse sua conta** com suas credenciais.
-* **Recupere sua senha** facilmente por e-mail,recebendo um código e alterando sua senha caso a esqueça.
-* **Encontre amigos** utilizando a barra de pesquisa.
-* **Envie convites de amizade** para se conectar com outros usuários.
-* **Personalize seu perfil**  com uma foto.
-* **Exclua sua conta**, se desejar.
+* **Autenticação:**
+    * Cadastro seguro com e-mail e senha.
+    * Login com credenciais.
+    * Recuperação de senha por e-mail com código de verificação.
+    * Exclusão de conta.
+* **Conexões Sociais:**
+    * Busca de usuários por nome.
+    * Envio e aceitação de solicitações de amizade.
+    * Lista de amigos com status online.
+    * Desfazer amizade.
+* **Interação em Tempo Real:**
+    * Chat em tempo real com amigos (Socket.IO).
+    * Lista de conversas com visualização da última mensagem.
+* **Personalização e Engajamento:**
+    * Personalização de perfil com foto (Cloudinary).
+    * Criação e visualização de posts.
+    * Sistema de curtidas em posts.
+    * Sistema de notificações de solicitações de amizade.
+* **Status Online:**
+    * Veja quais amigos estão online para iniciar uma conversa.
 
-**Interaja na plataforma:**
-
-* **Lista de Amigos:**  Visualize facilmente sua lista de amigos e gerencie suas conexões.
-* **Sistema de Notificações:**  Receba notificações sobre novas solicitações de amizade.
-* **Crie posts** para compartilhar seus pensamentos e momentos.
-* **Vote em posts** que você gostou.
-* **Deslogue-se** com segurança ao final da navegação.
-
-
-
-##  Tecnologias Utilizadas
+## ️ Tecnologias Utilizadas
 
 **Frontend:**
 
-- **React:**  Uma biblioteca JavaScript poderosa e flexível para construir interfaces de usuário interativas.
-- **TypeScript:**  Adiciona tipagem estática ao JavaScript, tornando o código mais robusto e fácil de manter.
-- **RTK Query (Redux Toolkit Query):**  Simplifica a comunicação com a API, gerenciando requisições assíncronas, caching e estados.
-- **Redux Toolkit:**  Uma maneira moderna e eficiente de escrever código Redux, simplificando o gerenciamento de estado.
-- **Tailwind CSS:**  Um framework CSS utilitário que permite criar designs personalizados rapidamente.
+* **React:** Biblioteca JavaScript para construção de interfaces de usuário interativas.
+* **TypeScript:** Superset do JavaScript para tipagem estática e melhor manutenção do código.
+* **RTK Query (Redux Toolkit Query):** Simplifica a busca de dados e o gerenciamento de cache.
+* **Redux Toolkit:** Gerenciamento de estado global de forma eficiente.
+* **Tailwind CSS:** Framework CSS utilitário para design rápido e responsivo.
+* **Socket.IO Client:** Para comunicação em tempo real com o servidor.
 
 **Backend:**
 
-- **Node.js:**  Um ambiente de execução JavaScript assíncrono e orientado a eventos, ideal para construir aplicações web escaláveis.
-- **TypeScript:**  Traz tipagem estática para o backend, melhorando a qualidade do código.
-- **Mongoose:**  Um ODM (Object Data Modeling) que facilita a interação com o banco de dados MongoDB.
-- **Express.js:**  Um framework web rápido e minimalista para Node.js, ideal para construir APIs RESTful.
-- **Cloudinary:** Um serviço de gerenciamento de mídia usado para armazenar e entregar imagens de forma otimizada e segura, ideal para personalização de perfis.
+* **Node.js:** Ambiente de execução JavaScript para o servidor.
+* **TypeScript:** Garante a tipagem estática no backend.
+* **Mongoose:** ODM para interação com o MongoDB.
+* **Express.js:** Framework web para criação de APIs RESTful.
+* **Cloudinary:** Serviço de gerenciamento de mídia para imagens.
+* **Socket.IO Server:** Para comunicação em tempo real com o frontend.
 
 **Banco de Dados:**
 
-- **MongoDB:**  Um banco de dados NoSQL orientado a documentos, conhecido por sua flexibilidade e escalabilidade.
+* **MongoDB:** Banco de dados NoSQL para armazenamento de dados flexível.
 
-## Como Executar o Projeto
+##  Como Executar o Projeto
 
 **Pré-requisitos:**
 
-- **Node.js** e **npm** (ou **yarn**) instalados em sua máquina.
-- **MongoDB** instalado e em execução na sua máquina local ou em um servidor remoto.
+* Node.js e npm (ou yarn) instalados.
+* MongoDB instalado e em execução.
 
-**Passos para Execução:**
+**Passos:**
 
-1. **Clone o Repositório:**
-   ```bash
-   git clone https://github.com/ca-madureira/social-media-mern.git
-   ```
+1.  **Clone o repositório:**
 
-2. **Instale as Dependências:**
-   ```bash
-   cd back
-   npm install
-   cd front && cd social
-   npm install
-   ```
+    ```bash
+    git clone [https://github.com/ca-madureira/social-media-mern.git](https://github.com/ca-madureira/social-media-mern.git)
+    ```
 
-3. **Configurações:**
-   - Crie um arquivo `.env` na raiz do projeto **backend** (`.env`)  e adicione as seguintes variáveis de ambiente, ajustando os valores conforme necessário:
-     ```
-     PORT= (ex:5000)
-     ORIGIN=
-     DB_URI=
-     JWT_SECRET=
-     ACCESS_TOKEN_SECRET=
-     REFRESH_TOKEN_SECRET=
-     CLOUD_NAME=
-     CLOUD_API_KEY=
-     CLOUD_SECRET_KEY=
-     NODE_CODE_SENDING_EMAIL_ADDRESS=
-     NODE_CODE_SENDING_EMAIL_PASSWORD=
-     
-     ```
-   - Crie um arquivo `.env.local` na raiz do projeto **frontend** (`.env.local`) e adicione:
-     ```
-     VITE_REACT_APP_BACKEND_BASEURL=http://localhost:5000
-     ```
+2.  **Instale as dependências:**
 
-4. **Inicializar a Aplicação:**
-   - Inicie o backend:
-     ```bash
-     cd backend
-     npm run dev (ou npm start)
-     ```
-   - Inicie o frontend:
-     ```bash
-     cd frontend
-     npm run start
-     ```
+    ```bash
+    cd social-media-mern/backend
+    npm install
+    cd ../frontend/social
+    npm install
+     cd ../../socket
+    npm install
+    ```
 
-##  🚀 Próximos Passos / Roadmap
+3.  **Configuração do Backend:**
 
-**Funcionalidades Futuras e Melhorias Planejadas:**
+    * Crie um arquivo `.env` na pasta `backend` com as seguintes variáveis:
 
+    ```
+    PORT=5000
+    ORIGIN=http://localhost:3000
+    DB_URI=mongodb://localhost:27017/amizapp
+    JWT_SECRET=seu_jwt_secret
+    ACCESS_TOKEN_SECRET=seu_access_token_secret
+    REFRESH_TOKEN_SECRET=seu_refresh_token_secret
+    CLOUD_NAME=seu_cloud_name
+    CLOUD_API_KEY=sua_cloud_api_key
+    CLOUD_SECRET_KEY=sua_cloud_secret_key
+    NODE_CODE_SENDING_EMAIL_ADDRESS=seu_email
+    NODE_CODE_SENDING_EMAIL_PASSWORD=sua_senha
+    ```
 
-- **Comentários em Posts:** Adicione e visualize comentários nos posts para facilitar o engajamento e discussões.
-- **Notificações Avançadas:** Receba notificações detalhadas sobre quem votou e quem comentou em seus posts.
-- **Sistema de Chat:** Interaja em tempo real com amigos e membros da comunidade através de um sistema de chat completo.
-- **Criação de Grupos:**  Crie e participe de grupos com interesses em comum.
-- **Lojinha Virtual:** Permite que os usuários criem uma loja dentro da plataforma para vender produtos ou serviços.
+4.  **Configuração do Frontend:**
 
+    * Crie um arquivo `.env.local` na pasta `frontend/social` com a seguinte variável:
 
+    ```
+    VITE_REACT_APP_BACKEND_BASEURL=http://localhost:5000
+    ```
 
+5.  **Inicie os servidores:**
+
+    ```bash
+    # Backend
+    cd social-media-mern/back
+    npm run dev
+
+    #Socket
+    cd social-media-mern/socket
+    npm run dev
+
+    # Frontend
+    cd social-media-mern/front/social
+    npm run dev
+    ```
+
+## ️ Capturas de Tela
 
 <div style="display: flex; justify-content: center; gap: 10px;">
 
@@ -122,7 +128,4 @@ O AmizApp é uma rede social totalmente funcional que criei para aprimorar minha
 <img src="https://github.com/user-attachments/assets/c1e6fbbb-ac02-4946-8a59-5a8f812813e6" width="500" />
 
 </div>
-
-
-
 

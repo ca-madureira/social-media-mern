@@ -1,10 +1,8 @@
 import mongoose from "mongoose";
-import { signToken } from "../middleware/token";
+
 import User from "../models/user.model";
 import Post from "../models/post.model";
-import bcrypt from "bcryptjs";
-
-import jwt from "jsonwebtoken";
+import cloudinary from "../utils/cloudinary";
 
 interface UserDataSearch {
   name: string;
@@ -19,23 +17,23 @@ export const deleteUserByIdService = async (id: string) => {
 export const searchUserService = async (data: UserDataSearch) => {
   const { name, email } = data;
 
-  // Verifica se o termo de pesquisa está vazio ou é uma string vazia
+
   const nameRegex = name ? `^${name}` : "";
   const emailRegex = email ? `^${email}` : "";
 
-  // Busca usuários com nome ou email que começam com o termo digitado
+
   const users = await User.find({
     $or: [
       { name: { $regex: nameRegex, $options: "i" } },
       { email: { $regex: emailRegex, $options: "i" } },
     ],
   })
-    .select("name avatar email friends") // Seleciona o nome, email e os amigos
+    .select("name avatar email friends")
     .populate({
-      path: "friends", // Campo que está sendo populado
-      select: "name avatar email", // Campos que você quer retornar dos amigos
+      path: "friends",
+      select: "name avatar email",
     });
-  // Retorna apenas os campos name, email e _id (por padrão)
+
   console.log(users);
   return users;
 };
@@ -47,7 +45,7 @@ export const sendInviteService = async (userId: string, friendId: string) => {
 
   const friend = await User.findByIdAndUpdate(
     friendId,
-    { $addToSet: { invites: userId } }, // $addToSet evita duplicados
+    { $addToSet: { invites: userId } },
     { new: true }
   );
 
@@ -61,7 +59,7 @@ export const sendInviteService = async (userId: string, friendId: string) => {
 export const allInvitesService = async (userId: string) => {
   const user = await User.findById(userId).populate({
     path: "invites",
-    select: "name email",
+    select: "avatar name email",
   });
 
   return user?.invites;
@@ -135,12 +133,12 @@ export const getFriendPostsService = async (
     throw new Error("USER_NOT_FOUND");
   }
 
-  const friendIds = user.friends.map((friend) => friend._id); // Extrai os IDs dos amigos
+  const friendIds = user.friends.map((friend) => friend._id);
 
-  // Buscar os posts dos amigos
+
   const friendPosts = await Post.find({ author: { $in: friendIds } })
-    .populate("author", "name email") // Para pegar o nome e avatar dos autores (amigos)
-    .sort({ createdAt: -1 }); // Ordenar pelos mais recentes
+    .populate("author", "name email")
+    .sort({ createdAt: -1 });
 
   return friendPosts;
 };
@@ -165,5 +163,26 @@ export const unfriendService = async (friendId: string, userId: string) => {
     await friend.save();
   } catch (err) {
     throw err;
+  }
+};
+
+export const uploadAvatarService = async (userId: string, avatar: string) => {
+  try {
+
+    const result = await cloudinary.uploader.upload(avatar, {
+      upload_preset: "social",
+    });
+
+
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { avatar: result.secure_url },
+      { new: true }
+    ).select("-password");
+
+    return user;
+  } catch (err: any) {
+    console.error(err);
+    throw new Error('Erro ao fazer upload do avatar');
   }
 };

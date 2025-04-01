@@ -15,18 +15,6 @@ const postSchema = new Schema(
       type: String,
       required: true,
     },
-    // reactions: {
-    //   sad: {
-    //     type: [mongoose.Types.ObjectId],
-    //     ref: "User",
-    //     default: [],
-    //   },
-    //   happy: {
-    //     type: [mongoose.Types.ObjectId],
-    //     ref: "User",
-    //     default: [],
-    //   },
-    // },
     votes: [
       {
         type: mongoose.Types.ObjectId,

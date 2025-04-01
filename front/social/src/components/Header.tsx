@@ -208,18 +208,19 @@ const Header = () => {
                   key={invite._id}
                 >
                   <header className="flex flex-col items-center">
+                    <img src={invite.avatar} className="w-14 h-14 rounded-full" />
                     <p>{invite.name}</p>
                     <p className="text-xs">{invite.email}</p>
                   </header>
                   <div className="flex justify-center gap-2">
                     <button
-                      className="p-2 bg-orange-600 rounded-md"
+                      className="p-2 text-sm bg-orange-600 rounded-md"
                       onClick={() => decline(invite._id)}
                     >
                       Recusar
                     </button>
                     <button
-                      className="p-2 bg-purple-500 rounded-md"
+                      className="p-2 text-sm bg-purple-500 rounded-md"
                       onClick={() => accept(invite._id)}
                     >
                       Aceitar

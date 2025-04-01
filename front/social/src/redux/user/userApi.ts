@@ -1,6 +1,6 @@
 import { apiSlice } from "../api/apiSlice";
 import { notify } from "../notify/notifySlice";
-import { UserData } from "./userSlice";
+import { UserData } from "../../interfaces";
 import {
   IdInvite,
   SearchParams,
@@ -26,10 +26,11 @@ export const userApi = apiSlice.injectEndpoints({
         try {
           const result = await queryFulfilled;
           // Corrigido para usar a estrutura correta de dispatch
-          console.log("comunicar", result.data.email);
+          console.log("comunicar", result);
           dispatch(
             notify({
               user: {
+                avatar: result.data.avatar,
                 name: result.data.name,
                 email: result.data.email,
               }, // Ajustar conforme a estrutura do seu resultado
@@ -89,11 +90,15 @@ export const userApi = apiSlice.injectEndpoints({
       invalidatesTags: ["invites"],
     }),
     getUser: builder.query<UserData, IdInvite>({
-      query: ({ id }) => ({
-        url: `/user/${id}`,
-        method: "GET",
-      }),
+      query: ({ id }) => {
+        console.log("ID dentro da query:", id);  // Verificando o valor de id na query
+        return {
+          url: `/user/${id}`,
+          method: "GET",
+        };
+      },
       providesTags: ["user"],
+
     }),
   }),
 });

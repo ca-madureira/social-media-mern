@@ -1,4 +1,3 @@
-import { isAuthenticatedToken, signToken } from '../middleware/token';
 import express from 'express';
 import {
   createUser,

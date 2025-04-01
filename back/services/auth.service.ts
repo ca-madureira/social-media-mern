@@ -52,7 +52,7 @@ export const createUserService = async (data: CreateUserData) => {
 
   await newUser.save();
 
-  // Populando os campos invites e friends
+
   const userWithRelations = await User.findById(newUser._id)
     .populate({
       path: "invites",
@@ -67,14 +67,14 @@ export const createUserService = async (data: CreateUserData) => {
     throw new Error("Usuário não encontrado após criação.");
   }
 
-  // Criando o token
+
   const token = signToken(userWithRelations);
 
-  // Garantindo que o retorno tenha a estrutura correta
+
   return {
     token,
     user: {
-      id: userWithRelations._id, // Convertendo _id para string e chamando de id
+      id: userWithRelations._id,
       name: userWithRelations.name,
       email: userWithRelations.email,
       friends: userWithRelations.friends,
@@ -129,19 +129,19 @@ export const sendForgotPasswordCodeService = async (email: string) => {
 
   const existingToken = await PasswordResetToken.findOne({
     userId: user?._id,
-    expiresAt: { $gt: new Date() }, // Token ainda válido
+    expiresAt: { $gt: new Date() },
   });
 
   const codeValue = Math.floor(Math.random() * 100000).toString();
-  const expiresAt = new Date(Date.now() + 3600000); // 1 hora de validade
+  const expiresAt = new Date(Date.now() + 3600000);
 
   if (existingToken) {
-    // Sobrescrever o token existente
+
     existingToken.token = codeValue;
     existingToken.expiresAt = expiresAt;
     await existingToken.save();
   } else {
-    // Criar um novo token se não existir um ativo
+
     await new PasswordResetToken({
       userId: user?._id,
       token: codeValue,

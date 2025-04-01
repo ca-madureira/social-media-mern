@@ -31,8 +31,8 @@ export const create = async (data: CreatePostData) => {
 export const getUserPostsService = async (data: UserPostsData) => {
   const { author } = data;
   const posts = await Post.find({ author })
-    .populate('author', 'name email') // Popula os dados do autor
-    .sort('-createdAt'); // Ordena por data de criação (mais recente primeiro)
+    .populate('author', 'name email')
+    .sort('-createdAt');
 
   return posts;
 };
@@ -44,6 +44,6 @@ export const deletePostByIdService = async (id: mongoose.Types.ObjectId) => {
 export const updatePostByIdService = async (data: UpdatePostData) => {
   const { id, content } = data;
 
-  // Atualiza o post pelo ID
+
   await Post.findByIdAndUpdate(id, { content });
 };

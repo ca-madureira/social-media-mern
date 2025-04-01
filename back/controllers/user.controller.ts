@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import mongoose from "mongoose";
-import cloudinary from "../utils/cloudinary";
+
+import { uploadAvatarService } from "../services/user.service";
 
 import { deleteUserByIdService } from "../services/user.service";
 import User from "../models/user.model";
@@ -17,18 +18,6 @@ import {
 export const deleteUserById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-
-    // Verifica se o usuário autenticado é o mesmo que está tentando deletar a conta
-    //   const userId = req.user?._id.toString();
-    // console.log('User ID from request:', req.user?._id.toHexString());
-    console.log("ID from URL params:", id);
-
-    // if (userId !== id) {
-    //   return res.status(403).json({
-    //     success: false,
-    //     message: 'Você só pode deletar sua própria conta',
-    //   });
-    // }
 
     await deleteUserByIdService(id);
 
@@ -219,21 +208,15 @@ export const allFriends = async (req: Request, res: Response) => {
 
 export const uploadAvatar = async (req: Request, res: Response) => {
   try {
+    const userId = req.user?._id as mongoose.Types.ObjectId;
+
     const { avatar } = req.body;
 
     if (!avatar) {
       return res.status(400).json({ message: "Avatar não fornecido." });
     }
 
-    const result = await cloudinary.uploader.upload(avatar, {
-      upload_preset: "social",
-    });
-
-    const user = await User.findByIdAndUpdate(
-      req?.user?._id,
-      { avatar: result.secure_url },
-      { new: true }
-    ).select("-password");
+    const user = await uploadAvatarService(userId.toString(), avatar);
 
     res.json(user);
   } catch (err: any) {
@@ -247,6 +230,19 @@ export const unfriend = async (req: Request, res: Response) => {
   const userId = req.user?._id as mongoose.Types.ObjectId;
 
   try {
-    await unfriendService(id, userId.toString());
-  } catch {}
+
+    if (!id || !userId) {
+      return res.status(400).json({ message: "ID inválido ou usuário não autenticado." });
+    }
+
+
+    const result = await unfriendService(id, userId.toString());
+
+    return res.status(200).json({ message: "Amigo removido com sucesso." });
+
+  } catch (err: any) {
+    console.error(err);
+
+    return res.status(500).json({ message: "Erro ao remover amigo. Tente novamente mais tarde." });
+  }
 };

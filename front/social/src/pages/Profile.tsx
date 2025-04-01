@@ -21,12 +21,13 @@ const Profile = () => {
   const { id } = useParams();
   const isChat = useSelector((state: RootState) => state.chat?.chatActive);
 
-  const { data: friend } = useGetUserQuery({ id: id! }, { skip: !id });
+  //const { data: friend } = useGetUserQuery({ id: id! }, { skip: !id });
+  const { data: friend } = useGetUserQuery({ id: id! });
 
   const isLoggedIn = !id || auth?.id === id;
   const userData = friend;
+  console.log('informacoes do params', userData)
 
-  console.log("USUARIO TA LOGADO", isLoggedIn);
 
   const { loginUser } = useSocket();
 

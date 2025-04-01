@@ -12,6 +12,14 @@ export interface User {
   invites: UserProfile[];
   friends: UserProfile[];
 }
+export interface UserData {
+  _id: string;
+  name: string;
+  email: string;
+  avatar: string;
+  invites: UserProfile[];
+  friends: UserProfile[];
+}
 
 export interface UserAuth {
   name: string;
@@ -20,7 +28,7 @@ export interface UserAuth {
 }
 
 export interface ProfileCardProps {
-  user: User;
+  user: UserData;
   isLoggedIn: boolean;
 }
 
@@ -103,6 +111,7 @@ export interface IdInvite {
 }
 
 export interface InvitePending {
+  avatar?: string;
   name?: string;
   email?: string;
   _id?: string;
@@ -174,7 +183,7 @@ export interface ChatState {
   name: string;
   avatar: string;
   id: string;
-  messages: any[]; // Ajuste conforme necessário
+  messages: [];
   unreadMessages: Record<string, number>;
-  listUsersOnline: { userId: string; socketId: string }[]; // Alteração aqui
+  listUsersOnline: { userId: string; socketId: string }[];
 }

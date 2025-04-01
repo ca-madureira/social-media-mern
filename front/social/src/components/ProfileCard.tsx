@@ -11,7 +11,7 @@ import { AiOutlineEdit } from "react-icons/ai";
 import { useUpdateAvatarMutation } from "../redux/profile/profileApi";
 import { UserProfile, ProfileCardProps } from "../interfaces";
 
-const ProfileCard: React.FC<ProfileCardProps> = ({ user, isLoggedIn }) => {
+const ProfileCard: React.FC<ProfileCardProps> = ({ user, isLoggedIn, refetchUser }) => { // Receba refetchUser
   const [sendInvite, { isLoading, error }] = useSendInviteMutation();
   const [msg, setMsg] = useState(false);
   const [isUnFriend, setIsUnfriend] = useState(false);
@@ -20,12 +20,8 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ user, isLoggedIn }) => {
   const [unfriend] = useUnfriendMutation();
   const { id } = useParams();
 
-  const isInvite = user?.invites?.some(
-    (invite: UserProfile) => invite.email === auth?.email
-  );
-  const isFriend = user?.friends?.some(
-    (friend: UserProfile) => friend.email === auth?.email
-  );
+  const isInvite = user?.invites?.some((invite: UserProfile) => invite.email === auth?.email);
+  const isFriend = user?.friends?.some((friend: UserProfile) => friend.email === auth?.email);
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files ? event.target.files[0] : null;
@@ -55,7 +51,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ user, isLoggedIn }) => {
 
   const sendInviteFriend = async () => {
     try {
-      await sendInvite({ id: user.id }).unwrap();
+      await sendInvite({ id: user._id }).unwrap();
       setMsg(true);
     } catch (err) {
       console.error("Falha ao enviar o convite:", err);
@@ -65,13 +61,14 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ user, isLoggedIn }) => {
 
   const handleUnfriend = async () => {
     try {
+      console.log('Estou deixando de ser seu amigo', user._id);
       setIsUnfriend(true);
-      await unfriend({ id: user.id }).unwrap();
+      await unfriend({ id: user._id }).unwrap();
+      refetchUser(); // Chame refetch aqui
       console.log(isUnFriend);
     } catch (err) {
       console.error("Erro ao desfazer amizade:", err);
     }
-
     console.log(isUnFriend);
   };
 
@@ -107,16 +104,13 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ user, isLoggedIn }) => {
         <h2 className="text-xl font-semibold font-mooli text-purple-500">
           {user?.name}
         </h2>
-        {/* <p className="text-xs text-gray-500 font-mooli">{user?.email}</p> */}
         {
           auth.id === id && (
-            <div className="flex items-center gap-1">
+            <div className="flex items-center justify-center gap-1">
               <div className="w-2 h-2 bg-lime-500 rounded-full"></div><span className="text-xs text-gray-500 font-mooli">online</span>
             </div>
           )
         }
-
-
       </header>
 
       {!isLoggedIn && (
@@ -137,7 +131,6 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ user, isLoggedIn }) => {
               className={`p-2 text-white font-semibold ${msg ? "bg-green-400" : "bg-purple-500"
                 }`}
               onClick={sendInviteFriend}
-              // onClick={showLogged}
               disabled={isLoading}
             >
               {isLoading ? "Enviando..." : msg ? "Enviado" : "Fazer Amizade"}
