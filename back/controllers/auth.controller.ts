@@ -42,8 +42,9 @@ export const loginUser = async (
 };
 
 export const sendForgotPasswordCode = async (req: Request, res: Response) => {
-  const { email } = req.body;
+  const { email } = req.body
 
+  console.log('Email vindo do body', req.body)
   try {
     const result = await sendForgotPasswordCodeService(email);
 
@@ -55,6 +56,7 @@ export const sendForgotPasswordCode = async (req: Request, res: Response) => {
       message: error.message || "Erro ao enviar o código de recuperação.",
     });
   }
+  console.log('valor do corpo', email)
 };
 
 export const verifyCode = async (req: Request, res: Response) => {

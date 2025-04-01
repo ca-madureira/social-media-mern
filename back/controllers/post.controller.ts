@@ -48,7 +48,7 @@ export const getUserPosts = async (req: Request, res: Response) => {
     if (id === user._id.toString()) {
       posts = await Post.find({
         author: { $in: [...user.friends, user._id] },
-      }).populate("author", "name avatar email");
+      }).populate("author", "name avatar email").sort("-createdAt");
     } else {
       posts = await Post.find({
         author: id,
