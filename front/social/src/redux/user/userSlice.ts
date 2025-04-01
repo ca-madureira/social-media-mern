@@ -1,16 +1,9 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { User } from "../../interfaces";
 
-export interface UserData {
-  _id: string;
-  name: string;
-  email: string;
-  avatar: string; // Adicione o campo avatar aqui
-  friends: object[];
-  invites: object[];
-}
 
-const initialState: UserData = {
-  _id: "",
+const initialState: User = {
+  id: "",
   name: "",
   email: "",
   avatar: "",
@@ -22,7 +15,7 @@ const UserSlice = createSlice({
   name: "user",
   initialState,
   reducers: {
-    setUser: (state, action: PayloadAction<UserData>) => {
+    setUser: (state, action: PayloadAction<User>) => {
       return { ...state, ...action.payload };
     },
   },

@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { ChatState } from "../../interfaces";
 
+
 const initialState: ChatState = {
   chatActive: false,
   name: "",
@@ -31,25 +32,6 @@ const chatSlice = createSlice({
       }
     },
 
-    addMessage(
-      state,
-      action: PayloadAction<{ content: string; conversationId: string }>
-    ) {
-      const { content, conversationId } = action.payload;
-      state.messages.push(content);
-      if (state.chatActive && state.id !== conversationId) {
-        if (!state.unreadMessages[conversationId]) {
-          state.unreadMessages[conversationId] = 0;
-        }
-        state.unreadMessages[conversationId] += 1;
-      }
-    },
-
-    resetUnreadMessages(state, action: PayloadAction<string>) {
-      const conversationId = action.payload;
-      state.unreadMessages[conversationId] = 0;
-    },
-
     setOnlineUsers(
       state,
       action: PayloadAction<{ userId: string; socketId: string }[]>
@@ -59,7 +41,7 @@ const chatSlice = createSlice({
   },
 });
 
-export const { toggleChat, addMessage, resetUnreadMessages, setOnlineUsers } =
+export const { toggleChat, setOnlineUsers } =
   chatSlice.actions;
 
 export default chatSlice.reducer;

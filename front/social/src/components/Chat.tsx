@@ -1,12 +1,15 @@
+import { IoMdCloseCircleOutline } from "react-icons/io";
+import { RiSendPlaneFill } from "react-icons/ri";
+
 import { useState, useRef, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
+
 import { RootState } from "../redux/store";
 import { useGetConversationBetweenUsersQuery } from "../redux/chat/conversationApi";
 import { useCreateMessageMutation } from "../redux/chat/messageApi";
 import { useSocket } from "../hooks/useSocket";
 import { toggleChat } from "../redux/chat/chatSlice";
-import { IoMdCloseCircleOutline } from "react-icons/io";
-import { RiSendPlaneFill } from "react-icons/ri";
+import { UserSocket } from "../interfaces";
 
 const Chat = () => {
   const [message, setMessage] = useState("");
@@ -20,6 +23,7 @@ const Chat = () => {
   );
   const chatActive = useSelector((state: RootState) => state.chat.chatActive);
 
+
   const { socket, sendMessage } = useSocket();
 
   const {
@@ -28,15 +32,15 @@ const Chat = () => {
     isError,
   } = useGetConversationBetweenUsersQuery({ senderId, receiverId });
 
-  const isUserOnline = usersOnline.some((user) => user.userId === receiverId);
+  const isUserOnline = usersOnline.some((user: UserSocket) => user.userId === receiverId);
 
   const [createMessage] = useCreateMessageMutation();
 
   const handleSendMessage = () => {
     if (message.trim()) {
-      const conversationId = "some-conversation-id";
 
-      sendMessage(senderId, receiverId, conversationId, message);
+
+      sendMessage(senderId, receiverId, message);
 
       createMessage({ senderId, receiverId, message })
         .then(() => {
@@ -76,12 +80,11 @@ const Chat = () => {
   if (!chatActive) return null;
 
   return (
-    <section className="absolute right-4 bottom-0 z-99 bg-white w-[25%] shadow-md shadow-purple-600">
-      <section className="relative flex items-center gap-2 bg-purple-500 px-2">
+    <section className="border-4 border-purple-500 fixed bottom-0 right-0 z-50 bg-white w-full md:w-[275px] shadow-md shadow-purple-600">
+      <section className="relative flex items-center gap-2  bg-purple-500 px-2 py-2">
         <img
-          className={`w-8 h-8 border border-2 rounded-full ${
-            isUserOnline ? "border-lime-400" : "border-purple-400"
-          }`}
+          className={`w-10 h-10 border border-2 rounded-full ${isUserOnline ? "border-lime-400" : "border-purple-400"
+            }`}
           src={friend.avatar || "default-avatar.png"}
           alt={`${friend.name}'s avatar`}
         />
@@ -92,7 +95,7 @@ const Chat = () => {
           </p>
         </div>
         <div
-          className="absolute right-4 text-white cursor-pointer"
+          className="absolute right-0 top-1 text-white cursor-pointer"
           onClick={handleCloseChat}
         >
           <IoMdCloseCircleOutline className="w-6 h-6 hover:text-purple-200" />
@@ -118,20 +121,18 @@ const Chat = () => {
             ) => (
               <div
                 key={index}
-                className={`flex ${
-                  message.senderId === senderId
-                    ? "justify-end"
-                    : "justify-start"
-                } mb-2`}
+                className={`flex ${message.senderId === senderId
+                  ? "justify-end"
+                  : "justify-start"
+                  } mb-2`}
               >
                 <div
-                  className={`max-w-[70%] p-2  ${
-                    message.senderId === senderId
-                      ? "bg-gradient-to-r from-violet-400 to-indigo-300 text-white font-medium"
-                      : "bg-gradient-to-r from-gray-200 to-violet-400 text-left font-medium"
-                  } break-words`}
+                  className={`max-w-[70%] px-2 ${message.senderId === senderId
+                    ? "border-2 rounded-md border-purple-200 bg-purple-200 text-violet-500 font-medium"
+                    : "border-2 rounded-md border-violet-200 bg-violet-200 text-left font-medium"
+                    } break-words`}
                 >
-                  <strong>
+                  <strong className="text-purple-800 text-sm">
                     {message.senderId === senderId ? "Você" : friend.name}:
                   </strong>{" "}
                   {message.message}
@@ -153,7 +154,7 @@ const Chat = () => {
           onChange={(e) => setMessage(e.target.value)}
         />
         <button
-          className="bg-purple-700 text-sm p-2 text-white font-bold"
+          className="bg-purple-500 text-sm p-2 text-white font-bold"
           onClick={handleSendMessage}
         >
           <RiSendPlaneFill />

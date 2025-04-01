@@ -115,14 +115,14 @@ export interface InvitesResponse {
 export interface IConversation {
   _id: string;
   members: IUser[];
-  messages: IMessage[];
-  lastMessage: IMessage;
+  messages: Message[];
+  lastMessage: Message;
   unreadMessages: number;
   createdAt: Date;
   updatedAt: Date;
 }
 
-export interface IMessage {
+export interface Message {
   _id: string;
   senderId: IUser;
   receiverId: IUser;
@@ -161,4 +161,20 @@ export interface UserSocketState {
 export interface ConversationState {
   senderId: string;
   receiverId: string;
+}
+
+export interface FormForgotPass {
+  email: string;
+  code: string;
+  password: string;
+  confirmPassword: string;
+}
+export interface ChatState {
+  chatActive: boolean;
+  name: string;
+  avatar: string;
+  id: string;
+  messages: any[]; // Ajuste conforme necessário
+  unreadMessages: Record<string, number>;
+  listUsersOnline: { userId: string; socketId: string }[]; // Alteração aqui
 }

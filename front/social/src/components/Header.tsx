@@ -1,15 +1,17 @@
-import { useState } from "react";
 import { AiOutlineUserDelete } from "react-icons/ai";
 import { IoLogOutOutline, IoSettingsSharp } from "react-icons/io5";
+import { FaHome, FaUserFriends } from "react-icons/fa";
+import { FaSearch } from "react-icons/fa";
+
+import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { useDeleteAccountMutation } from "../redux/auth/authApi";
 import { useNavigate } from "react-router-dom";
+
+import { useDeleteAccountMutation } from "../redux/auth/authApi";
 import { userLoggedOut } from "../redux/auth/authSlice";
 import ModalConfirm from "./ModalConfirm";
 import { RootState } from "../redux/store";
 import { setUser } from "../redux/user/userSlice";
-import { FaHome, FaUserFriends } from "react-icons/fa";
-import { FaSearch } from "react-icons/fa";
 import { useSearchUsersQuery } from "../redux/auth/authApi";
 import { useSocket } from "../hooks/useSocket";
 import { UserSearch } from "../interfaces";
@@ -18,7 +20,7 @@ import {
   useAcceptInviteMutation,
   useDeclineInviteMutation,
 } from "../redux/user/userApi";
-import { User } from "../interfaces";
+
 
 const Header = () => {
   const navigate = useNavigate();
@@ -105,7 +107,7 @@ const Header = () => {
     <>
       <header className="relative bg-purple-500 w-full">
         <div className="flex container mx-auto justify-between items-center gap-2 p-4">
-          <h1 className="text-xl text-white font-semibold">AmizApp</h1>
+          <h1 className="text-xl text-white font-semibold hidden md:flex">AmizApp</h1>
 
           <div className="relative w-full max-w-md">
             <input
@@ -197,12 +199,12 @@ const Header = () => {
       )}
 
       {openInvites && (
-        <aside className="absolute right-0 p-2 bg-purple-600">
+        <aside className="absolute top-16 right-0 p-4 bg-purple-600 shadow-lg rounded-lg z-30 max-w-sm">
           <ul>
             {data.invites.length > 0 ? (
               data.invites.map((invite) => (
                 <article
-                  className="text-white flex flex-col gap-2"
+                  className="text-white flex flex-col gap-2 mb-4"
                   key={invite._id}
                 >
                   <header className="flex flex-col items-center">
@@ -211,15 +213,13 @@ const Header = () => {
                   </header>
                   <div className="flex justify-center gap-2">
                     <button
-                      className={`p-2 bg-orange-600
-                      }`}
+                      className="p-2 bg-orange-600 rounded-md"
                       onClick={() => decline(invite._id)}
                     >
                       Recusar
                     </button>
                     <button
-                      className={`p-2 bg-purple-500
-                      }`}
+                      className="p-2 bg-purple-500 rounded-md"
                       onClick={() => accept(invite._id)}
                     >
                       Aceitar
@@ -233,6 +233,7 @@ const Header = () => {
           </ul>
         </aside>
       )}
+
 
       {openModalConfirm && (
         <ModalConfirm

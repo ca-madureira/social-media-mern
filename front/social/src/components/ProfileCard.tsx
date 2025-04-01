@@ -55,7 +55,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ user, isLoggedIn }) => {
 
   const sendInviteFriend = async () => {
     try {
-      await sendInvite({ id: user._id }).unwrap();
+      await sendInvite({ id: user.id }).unwrap();
       setMsg(true);
     } catch (err) {
       console.error("Falha ao enviar o convite:", err);
@@ -66,8 +66,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ user, isLoggedIn }) => {
   const handleUnfriend = async () => {
     try {
       setIsUnfriend(true);
-      await unfriend({ id: user._id }).unwrap();
-
+      await unfriend({ id: user.id }).unwrap();
       console.log(isUnFriend);
     } catch (err) {
       console.error("Erro ao desfazer amizade:", err);
@@ -77,7 +76,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ user, isLoggedIn }) => {
   };
 
   return (
-    <aside className="h-2/5 flex flex-col bg-white shadow-purple-600 shadow-md space-y-6 items-center p-4 mt-2">
+    <aside className="min-w-[150px] h-2/5 flex flex-col border-2 border-purple-300 bg-white shadow-purple-600 shadow-md space-y-6 items-center p-4 mt-2">
       <div className="relative group">
         <img
           src={
@@ -105,10 +104,19 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ user, isLoggedIn }) => {
       </div>
 
       <header className="text-center">
-        <h2 className="text-lg font-semibold font-mooli text-purple-600">
+        <h2 className="text-xl font-semibold font-mooli text-purple-500">
           {user?.name}
         </h2>
-        <p className="text-xs text-gray-500 font-mooli">{user?.email}</p>
+        {/* <p className="text-xs text-gray-500 font-mooli">{user?.email}</p> */}
+        {
+          auth.id === id && (
+            <div className="flex items-center gap-1">
+              <div className="w-2 h-2 bg-lime-500 rounded-full"></div><span className="text-xs text-gray-500 font-mooli">online</span>
+            </div>
+          )
+        }
+
+
       </header>
 
       {!isLoggedIn && (
@@ -126,9 +134,8 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ user, isLoggedIn }) => {
             </p>
           ) : (
             <button
-              className={`p-2 text-white font-semibold ${
-                msg ? "bg-green-400" : "bg-purple-500"
-              }`}
+              className={`p-2 text-white font-semibold ${msg ? "bg-green-400" : "bg-purple-500"
+                }`}
               onClick={sendInviteFriend}
               // onClick={showLogged}
               disabled={isLoading}

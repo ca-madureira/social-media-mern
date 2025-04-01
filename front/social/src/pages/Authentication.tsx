@@ -101,9 +101,8 @@ const Authentication = () => {
                 },
               })}
               placeholder="Nome"
-              className={`p-2 w-full border rounded  border-purple-500 text-purple-500 font-mooli outline-none ${
-                errors.name ? "border-red-500" : "border-[#c3cad9]"
-              }`}
+              className={`p-2 w-full border rounded  border-purple-500 text-purple-500 font-mooli outline-none ${errors.name ? "border-red-500" : "border-[#c3cad9]"
+                }`}
             />
           )}
           {errors.name?.message && (
@@ -111,9 +110,8 @@ const Authentication = () => {
           )}
 
           <input
-            className={`p-2 border rounded w-full border-purple-500 text-purple-500 font-mooli outline-none ${
-              errors.email ? "border-red-500" : "border-[#c3cad9]"
-            }`}
+            className={`p-2 border rounded w-full border-purple-500 text-purple-500 font-mooli outline-none ${errors.email ? "border-red-500" : "border-[#c3cad9]"
+              }`}
             type="email"
             id="email"
             {...register("email", {
@@ -147,9 +145,8 @@ const Authentication = () => {
               },
             })}
             placeholder="Senha"
-            className={`p-2 border rounded w-full border-purple-500 text-purple-500 font-mooli outline-none ${
-              errors.password ? "border-red-500" : "border-[#c3cad9]"
-            }`}
+            className={`p-2 border rounded w-full border-purple-500 text-purple-500 font-mooli outline-none ${errors.password ? "border-red-500" : "border-[#c3cad9]"
+              }`}
           />
           {errors.password?.message && (
             <p className="text-red-500 text-xs mt-1">
@@ -173,9 +170,8 @@ const Authentication = () => {
                   },
                 })}
                 placeholder="Repita sua senha"
-                className={`p-2 mt-2 border rounded w-full border-purple-500 text-purple-500 font-mooli outline-none ${
-                  errors.confirmPassword ? "border-red-500" : "border-[#c3cad9]"
-                }`}
+                className={`p-2 mt-2 border rounded w-full border-purple-500 text-purple-500 font-mooli outline-none ${errors.confirmPassword ? "border-red-500" : "border-[#c3cad9]"
+                  }`}
               />
 
               {errors.confirmPassword?.message && (
@@ -222,7 +218,7 @@ const Authentication = () => {
             </>
           ) : (
             <>
-              <h2 className="text-center font-mooli font-semibold text-white">
+              <h2 className="text-center font-mooli font-semibold text-white mt-6">
                 Já possui uma conta?
               </h2>
               <button

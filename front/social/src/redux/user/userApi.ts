@@ -79,6 +79,7 @@ export const userApi = apiSlice.injectEndpoints({
         url: `/user/unfriend/${id}`,
         method: "PUT",
       }),
+      invalidatesTags: ["user"]
     }),
     declineInvite: builder.mutation<void, IdInvite>({
       query: ({ id }) => ({

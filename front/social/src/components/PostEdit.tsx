@@ -31,14 +31,13 @@ const PostEdit = ({ user }: PostEditProps) => {
   };
 
   return (
-    <section className="w-full flex gap-2 bg-white shadow-purple-600 shadow-md p-2">
+    <section className="w-full flex border-2 border-purple-300 gap-2 bg-white shadow-purple-600 shadow-md p-2">
       <img
         className="w-14 h-14 rounded-md border-4 border-purple-200"
-        src={`${
-          user?.avatar
-            ? user?.avatar
-            : "https://cdn-icons-png.flaticon.com/512/6188/6188625.png"
-        }`}
+        src={`${user?.avatar
+          ? user?.avatar
+          : "https://cdn-icons-png.flaticon.com/512/6188/6188625.png"
+          }`}
         alt="User Avatar"
       />
       <div className="w-full">
@@ -48,7 +47,7 @@ const PostEdit = ({ user }: PostEditProps) => {
           maxLength={250}
           placeholder="O que está pensando?"
           className={
-            "resize-none font-mooli text-sm text-fuchsia-800 outline-none border-2 border-purple-200 w-full p-2"
+            "resize-none font-mooli text-sm text-violet-800 outline-none border-2 border-purple-200 w-full p-2"
           }
         />
 

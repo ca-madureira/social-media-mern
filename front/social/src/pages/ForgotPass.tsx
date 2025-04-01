@@ -35,8 +35,10 @@ const ForgotPass = () => {
   const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   const handleSendEmail = async (data: { email: string }) => {
-    await sendForgotPasswordCode(data.email).unwrap();
+
+    await sendForgotPasswordCode(data).unwrap();
     setStep(2);
+    console.log('conteudo do email', data.email)
   };
 
   const handleSendCode = async (otpCode: string) => {

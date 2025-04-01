@@ -3,12 +3,13 @@ import { apiSlice } from "./api/apiSlice";
 import authReducer, { AuthState } from "../redux/auth/authSlice";
 
 import postReducer, { PostState } from "../redux/post/postSlice";
-import friendReducer, { UserData } from "./user/userSlice";
+import friendReducer from "./user/userSlice";
 import notifyReducer from "../redux/notify/notifySlice";
 import chatReducer from "./chat/chatSlice";
 import connectionReducer from "./chat/connectionSlice";
-import { ChatState } from "./chat/chatSlice";
-import { OnlineUsersState } from "./chat/connectionSlice";
+import { ChatState } from "../interfaces";
+import { UserSocketState } from "../interfaces";
+import { User } from "../interfaces";
 export const store = configureStore({
   reducer: {
     [apiSlice.reducerPath]: apiSlice.reducer,
@@ -26,10 +27,10 @@ export const store = configureStore({
 export type RootState = {
   auth: AuthState;
   post: PostState;
-  user: UserData;
+  user: User;
   notify: AuthState;
   chat: ChatState;
-  connection: OnlineUsersState;
+  connection: UserSocketState;
   [apiSlice.reducerPath]: ReturnType<typeof apiSlice.reducer>;
 };
 export type AppDispatch = typeof store.dispatch;

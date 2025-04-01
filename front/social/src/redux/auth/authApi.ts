@@ -120,12 +120,15 @@ export const authApi = apiSlice.injectEndpoints({
         };
       },
     }),
-    sendForgotPasswordCode: builder.mutation<void, string>({
-      query: (data) => ({
-        url: "/auth/forgotPass",
-        method: "POST",
-        body: data,
-      }),
+    sendForgotPasswordCode: builder.mutation<void, { email: string }>({
+      query: (data) => {
+        console.log('valor do email pelo rtk query', data); // Isso vai mostrar o valor de 'data' no console
+        return {
+          url: "/auth/forgotPass",
+          method: "POST",
+          body: data,
+        };
+      },
     }),
     verifyCode: builder.mutation<void, { email: string; code: string }>({
       query: (data) => ({

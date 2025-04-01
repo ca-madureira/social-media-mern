@@ -12,3 +12,16 @@ body {
   @apply bg-purple-200;
   min-height: 100vh;
 }
+
+.scroll-chat::-webkit-scrollbar {
+  width: 4px;
+
+
+}
+
+.scroll-chat::-webkit-scrollbar-thumb {
+  background-color: #bc91e4;
+
+  border-radius: 6px;
+
+}

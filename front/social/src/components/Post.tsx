@@ -59,11 +59,11 @@ const Post = () => {
   };
 
   return (
-    <section className="w-full md:space-y-4">
+    <section className="w-full space-y-2 md:space-y-4">
       {data?.posts.map((post: PostData, index: number) => (
         <article
           key={index}
-          className="bg-white shadow-purple-600 shadow-md rounded-md p-1"
+          className="bg-white  border-2 border-purple-300 rounded-md shadow-purple-600 shadow-md rounded-md p-1"
         >
           <header className="flex gap-2 justify-end items-center">
             {post.author._id === auth && (

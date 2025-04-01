@@ -39,30 +39,31 @@ const Profile = () => {
   return (
     <>
       <Header />
-      <main className="flex flex-col">
+      <main className="flex flex-col relative">
         <section className="flex flex-col md:flex-row space-y-2 md:justify-evenly md:mt-4">
           <ProfileCard user={userData} isLoggedIn={isLoggedIn} />
 
-          <section className="flex flex-col md:w-2/5 items-center space-y-2 md:space-y-4">
+          <section className="flex flex-col md:w-1/3 items-center space-y-2 md:space-y-4">
             {isLoggedIn && (
               <PostEdit user={userData} setOpenModal={setOpenModal} />
             )}
 
-            <Post user={userData} />
+            <Post />
           </section>
 
-          <section className="w-full md:w-[35%] flex flex-col gap-4">
+          <section className="w-full md:w-[35%] flex flex-col gap-6">
             <Friends user={userData} />
-            <UserOn />
+
 
             {isLoggedIn && (
-              <section className="p-4 bg-white shadow-md shadow-purple-600 flex flex-col gap-2 h-[70%] overflow-y-auto">
-                <h4 className="text-lg font-bold mb-2 text-purple-700">
+              <section className="p-4 border-2 border-purple-300 bg-white shadow-md shadow-purple-600 flex flex-col gap-2 h-[275px] ">
+                <h4 className="text-lg font-mooli font-semibold mb-4 text-purple-400">
                   Conversas
                 </h4>
 
                 <Conversations />
               </section>
+
             )}
           </section>
         </section>

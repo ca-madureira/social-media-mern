@@ -5,7 +5,7 @@ import io from "socket.io-client";
 import { setOnlineUsers, removeUser } from "../redux/chat/connectionSlice";
 import { UserSocket } from "../interfaces";
 
-const socket = io("http://localhost:5000");
+export const socket = io("http://localhost:5000");
 
 export function useSocket() {
   const dispatch = useDispatch();
@@ -16,7 +16,6 @@ export function useSocket() {
 
   const logoutUser = (userId: string) => {
     socket.emit("user-disconnect", userId);
-
     dispatch(removeUser(userId));
   };
 
@@ -46,5 +45,6 @@ export function useSocket() {
     };
   }, [dispatch]);
 
-  return { loginUser, sendMessage, logoutUser };
+
+  return { socket, loginUser, sendMessage, logoutUser };
 }

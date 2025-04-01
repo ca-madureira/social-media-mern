@@ -40,7 +40,7 @@ const postApi = apiSlice.injectEndpoints({
         }
       },
     }),
-    deletePostById: builder.mutation<void, IdPost>({
+    deletePostById: builder.mutation<void, string>({
       query: (idPost) => ({
         url: `/posts/delete/${idPost}`,
         method: "DELETE",

@@ -9,14 +9,28 @@ const conversationApi = apiSlice.injectEndpoints({
         method: "POST",
         body: { senderId, receiverId },
       }),
-      providesTags: ["messages"],
+      providesTags: ["message"],
     }),
     getAllUserConversations: builder.query<any, void>({
       query: () => ({
         url: `/conversations/friends`,
         method: "GET",
       }),
-      providesTags: ["messages"],
+       async onQueryStarted(_, { queryFulfilled, dispatch }) {
+              try {
+                const { data } = await queryFulfilled;
+                console.log("todas as conversas:", data);
+                
+              } catch (error: unknown) {
+                // Verificando se o erro é uma instância de Error antes de acessar suas propriedades
+                if (error instanceof Error) {
+                  console.error("Erro ao processar a solicitação:", error.message);
+                } else {
+                  console.error("Erro desconhecido:", error);
+                }
+              }
+            },
+      
     }),
   }),
 });
