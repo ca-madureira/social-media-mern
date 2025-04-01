@@ -100,7 +100,7 @@ O AmizApp é uma rede social completa, desenvolvida com a stack MERN (MongoDB, E
     * Crie um arquivo `.env.local` na pasta `frontend/social` com a seguinte variável:
 
     ```
-    VITE_REACT_APP_BACKEND_BASEURL=http://localhost:5000
+    VITE_REACT_APP_BACKEND_BASEURL=http://localhost:3000
     ```
 
 5.  **Inicie os servidores:**
