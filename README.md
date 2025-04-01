@@ -82,7 +82,7 @@ O AmizApp é uma rede social completa, desenvolvida com a stack MERN (MongoDB, E
     * Crie um arquivo `.env` na pasta `backend` com as seguintes variáveis:
 
     ```
-    PORT=5000
+    PORT=3000
     ORIGIN=http://localhost:3000
     DB_URI=mongodb://localhost:27017/amizapp
     JWT_SECRET=seu_jwt_secret
