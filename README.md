@@ -82,7 +82,7 @@ O AmizApp é uma rede social completa, desenvolvida com a stack MERN (MongoDB, E
     * Crie um arquivo `.env` na pasta `backend` com as seguintes variáveis:
 
     ```
-    PORT=5000
+    PORT=3000
     ORIGIN=http://localhost:3000
     DB_URI=mongodb://localhost:27017/amizapp
     JWT_SECRET=seu_jwt_secret
@@ -100,7 +100,7 @@ O AmizApp é uma rede social completa, desenvolvida com a stack MERN (MongoDB, E
     * Crie um arquivo `.env.local` na pasta `frontend/social` com a seguinte variável:
 
     ```
-    VITE_REACT_APP_BACKEND_BASEURL=http://localhost:5000
+    VITE_REACT_APP_BACKEND_BASEURL=http://localhost:3000
     ```
 
 5.  **Inicie os servidores:**
@@ -127,5 +127,22 @@ O AmizApp é uma rede social completa, desenvolvida com a stack MERN (MongoDB, E
 
 <img src="https://github.com/user-attachments/assets/c1e6fbbb-ac02-4946-8a59-5a8f812813e6" width="500" />
 
+</div>
+<div align="center">
+  <img src="https://github.com/user-attachments/assets/1cccb316-4f06-47dd-859e-e0aaa4d8dfa6"/>
+</div>
+
+<br />
+
+<div align="center">
+  <img src="https://github.com/user-attachments/assets/e9823f10-8a56-40cc-8de8-c97abd255b2c"/>
+</div>
+
+<div align="center">
+  <img src="https://github.com/user-attachments/assets/fe0b8372-9cf0-45ba-94e6-8ecb1f0b9f45"/>
+</div>
+
+<div align="center">
+  <img src="https://github.com/user-attachments/assets/93a8831f-d5d7-41e4-bf77-8577babb9906"/>
 </div>
 
