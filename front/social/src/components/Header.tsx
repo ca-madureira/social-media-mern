@@ -3,7 +3,7 @@ import { IoLogOutOutline, IoSettingsSharp } from "react-icons/io5";
 import { FaHome, FaUserFriends } from "react-icons/fa";
 import { FaSearch } from "react-icons/fa";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
@@ -47,6 +47,23 @@ const Header = () => {
 
   const { logoutUser } = useSocket();
 
+  const searchRef = useRef(null);
+  const [isSearchActive, setIsSearchActive] = useState(false);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setIsSearchActive(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   const deleteUser = async () => {
     await deleteAccount(auth.id);
     navigate("/login");
@@ -58,8 +75,6 @@ const Header = () => {
 
     navigate("/login");
   };
-
-  console.log("A LISTA DE CONVITES", data.invites);
 
   const handleHome = () => {
     dispatch(
@@ -89,7 +104,6 @@ const Header = () => {
   const handleFriendClick = (friend: UserSearch) => {
     dispatch(setUser(user));
     navigate(`/${friend._id}`);
-    console.log(friend);
   };
 
   const decline = async (id: string | undefined) => {
@@ -109,43 +123,45 @@ const Header = () => {
         <div className="flex container mx-auto justify-between items-center gap-2 p-4">
           <h1 className="text-xl text-white font-semibold hidden md:flex">AmizApp</h1>
 
-          <div className="relative w-full max-w-md">
+          <div
+            className="relative w-full max-w-md"
+            ref={searchRef}
+          >
             <input
               className="px-2 outline-none p-2 bg-purple-300 w-full placeholder-white"
               type="search"
               placeholder="Pesquisar por nome..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
+              onFocus={() => setIsSearchActive(true)}
             />
             <button className="absolute right-0 top-0 h-full bg-purple-700 p-2 text-white">
               <FaSearch />
             </button>
 
-            {searchTerm &&
-              searchResults?.users &&
-              searchResults.users.length > 0 && (
-                <div className="absolute left-0 top-full mt-2 bg-white w-full z-10 shadow-lg rounded-md md:p-4">
-                  {searchResults.users.map((user: UserSearch) => (
-                    <div
-                      key={user._id}
-                      className="flex items-start cursor-pointer hover:bg-purple-100 p-2"
-                      onClick={() => handleFriendClick(user)}
-                    >
-                      <img
-                        src={user.avatar}
-                        alt={`${user.name} avatar`}
-                        className="w-10 h-10 rounded-full mr-4"
-                      />
-                      <div className="flex flex-col w-full overflow-hidden">
-                        <span className="font-semibold truncate">
-                          {user.name}
-                        </span>
-                        <span className=" truncate">{user.email}</span>
-                      </div>
+            {isSearchActive && searchTerm && searchResults?.users && searchResults.users.length > 0 && (
+              <div className="absolute left-0 top-full mt-2 bg-white w-full z-10 shadow-lg rounded-md md:p-4">
+                {searchResults.users.map((user: UserSearch) => (
+                  <div
+                    key={user._id}
+                    className="flex items-start cursor-pointer hover:bg-purple-100 p-2"
+                    onClick={() => handleFriendClick(user)}
+                  >
+                    <img
+                      src={user.avatar}
+                      alt={`${user.name} avatar`}
+                      className="w-10 h-10 rounded-full mr-4"
+                    />
+                    <div className="flex flex-col w-full overflow-hidden">
+                      <span className="font-semibold truncate">
+                        {user.name}
+                      </span>
+                      <span className=" truncate">{user.email}</span>
                     </div>
-                  ))}
-                </div>
-              )}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="flex">
@@ -234,7 +250,6 @@ const Header = () => {
           </ul>
         </aside>
       )}
-
 
       {openModalConfirm && (
         <ModalConfirm

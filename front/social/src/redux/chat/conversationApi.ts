@@ -16,21 +16,8 @@ const conversationApi = apiSlice.injectEndpoints({
         url: `/conversations/friends`,
         method: "GET",
       }),
-       async onQueryStarted(_, { queryFulfilled, dispatch }) {
-              try {
-                const { data } = await queryFulfilled;
-                console.log("todas as conversas:", data);
-                
-              } catch (error: unknown) {
-                // Verificando se o erro é uma instância de Error antes de acessar suas propriedades
-                if (error instanceof Error) {
-                  console.error("Erro ao processar a solicitação:", error.message);
-                } else {
-                  console.error("Erro desconhecido:", error);
-                }
-              }
-            },
-      
+      providesTags: ["conversation"]
+
     }),
   }),
 });

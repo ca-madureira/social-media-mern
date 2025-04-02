@@ -1,9 +1,9 @@
 import { apiSlice } from "../api/apiSlice";
 
 export interface MessageData {
-  senderId:string, 
-  receiverId:string,
-  message:string
+  senderId: string,
+  receiverId: string,
+  message: string
 }
 
 const messageApi = apiSlice.injectEndpoints({
@@ -14,7 +14,7 @@ const messageApi = apiSlice.injectEndpoints({
         method: "POST",
         body: messageData,
       }),
-      invalidatesTags: ["message"],
+      invalidatesTags: ["message", "conversation"],
     }),
   }),
 });

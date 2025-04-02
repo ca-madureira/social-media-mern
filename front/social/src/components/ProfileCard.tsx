@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   useSendInviteMutation,
   useUnfriendMutation,
@@ -11,17 +11,22 @@ import { AiOutlineEdit } from "react-icons/ai";
 import { useUpdateAvatarMutation } from "../redux/profile/profileApi";
 import { UserProfile, ProfileCardProps } from "../interfaces";
 
-const ProfileCard: React.FC<ProfileCardProps> = ({ user, isLoggedIn, refetchUser }) => { // Receba refetchUser
+const ProfileCard: React.FC<ProfileCardProps> = ({ user, isLoggedIn }) => {
   const [sendInvite, { isLoading, error }] = useSendInviteMutation();
-  const [msg, setMsg] = useState(false);
   const [isUnFriend, setIsUnfriend] = useState(false);
   const auth = useSelector((state: RootState) => state.auth);
   const [updateAvatar] = useUpdateAvatarMutation();
   const [unfriend] = useUnfriendMutation();
   const { id } = useParams();
 
-  const isInvite = user?.invites?.some((invite: UserProfile) => invite.email === auth?.email);
-  const isFriend = user?.friends?.some((friend: UserProfile) => friend.email === auth?.email);
+
+  const [isInvite, setIsInvite] = useState(false);
+  const [isFriend, setIsFriend] = useState(false);
+
+  useEffect(() => {
+    setIsInvite(user?.invites?.some((invite: UserProfile) => invite.email === auth?.email) || false);
+    setIsFriend(user?.friends?.some((friend: UserProfile) => friend.email === auth?.email) || false);
+  }, [user, auth?.email, id]);
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files ? event.target.files[0] : null;
@@ -52,11 +57,10 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ user, isLoggedIn, refetchUser
   const sendInviteFriend = async () => {
     try {
       await sendInvite({ id: user._id }).unwrap();
-      setMsg(true);
+      setIsInvite(true);
     } catch (err) {
       console.error("Falha ao enviar o convite:", err);
     }
-    console.log(user);
   };
 
   const handleUnfriend = async () => {
@@ -64,7 +68,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ user, isLoggedIn, refetchUser
       console.log('Estou deixando de ser seu amigo', user._id);
       setIsUnfriend(true);
       await unfriend({ id: user._id }).unwrap();
-      refetchUser(); // Chame refetch aqui
+      setIsFriend(false);
       console.log(isUnFriend);
     } catch (err) {
       console.error("Erro ao desfazer amizade:", err);
@@ -76,10 +80,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ user, isLoggedIn, refetchUser
     <aside className="min-w-[150px] h-2/5 flex flex-col border-2 border-purple-300 bg-white shadow-purple-600 shadow-md space-y-6 items-center p-4 mt-2">
       <div className="relative group">
         <img
-          src={
-            user?.avatar ||
-            "https://cdn-icons-png.flaticon.com/512/6188/6188625.png"
-          }
+          src={user?.avatar || "https://cdn-icons-png.flaticon.com/512/6188/6188625.png"}
           className="w-24 h-26 rounded-md border-2 border-purple-200 cursor-pointer"
           alt={`Foto de perfil de ${user?.name}`}
         />
@@ -104,18 +105,17 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ user, isLoggedIn, refetchUser
         <h2 className="text-xl font-semibold font-mooli text-purple-500">
           {user?.name}
         </h2>
-        {
-          auth.id === id && (
-            <div className="flex items-center justify-center gap-1">
-              <div className="w-2 h-2 bg-lime-500 rounded-full"></div><span className="text-xs text-gray-500 font-mooli">online</span>
-            </div>
-          )
-        }
+        {auth.id === id && (
+          <div className="flex items-center justify-center gap-1">
+            <div className="w-2 h-2 bg-lime-500 rounded-full"></div>
+            <span className="text-xs text-gray-500 font-mooli">online</span>
+          </div>
+        )}
       </header>
 
       {!isLoggedIn && (
         <>
-          {isFriend && !isUnFriend ? (
+          {isFriend ? (
             <button
               className="bg-violet-300 p-2 text-white font-medium"
               onClick={handleUnfriend}
@@ -128,12 +128,11 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ user, isLoggedIn, refetchUser
             </p>
           ) : (
             <button
-              className={`p-2 text-white font-semibold ${msg ? "bg-green-400" : "bg-purple-500"
-                }`}
+              className={`p-2 text-white font-semibold ${isLoading ? "bg-gray-400" : "bg-purple-500"}`}
               onClick={sendInviteFriend}
               disabled={isLoading}
             >
-              {isLoading ? "Enviando..." : msg ? "Enviado" : "Fazer Amizade"}
+              {isLoading ? "Enviando..." : "Fazer Amizade"}
             </button>
           )}
         </>

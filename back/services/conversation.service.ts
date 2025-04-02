@@ -67,7 +67,7 @@ export const getAllUserConversationsService = async (userId: string) => {
         match: { _id: { $ne: userId } },
       }
     ],
-  });
+  }).sort("-createdAt");;
 
   return conversations;
 };

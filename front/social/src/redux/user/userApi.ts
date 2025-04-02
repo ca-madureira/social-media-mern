@@ -22,6 +22,7 @@ export const userApi = apiSlice.injectEndpoints({
         url: `/user/invite/${id}`,
         method: "PUT",
       }),
+      invalidatesTags: ["user", "invites"],
       async onQueryStarted(_, { queryFulfilled, dispatch }) {
         try {
           const result = await queryFulfilled;
